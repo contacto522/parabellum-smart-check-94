@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Shield, UserCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import logo from '@/assets/logo-parabellum.png';
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -84,10 +85,10 @@ export default function Auth() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 p-4">
       <div className="w-full max-w-md">
         <div className="flex justify-center mb-8">
-          <div className="flex items-center gap-2">
-            <Shield className="w-10 h-10 text-primary" />
+          <div className="flex items-center gap-3">
+            <img src={logo} alt="Parabellum Smart Check" className="w-12 h-12" />
             <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-              SecureAccess
+              Parabellum Smart Check
             </h1>
           </div>
         </div>

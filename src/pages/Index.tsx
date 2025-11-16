@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import heroImage from "@/assets/hero-security.jpg";
+import logo from "@/assets/logo-parabellum.png";
 
 const Index = () => {
   return (
@@ -11,9 +12,9 @@ const Index = () => {
       <header className="fixed top-0 w-full z-50 border-b border-border/40 bg-background/80 backdrop-blur-lg">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Shield className="h-8 w-8 text-accent" />
-              <span className="text-xl font-bold text-foreground">SecureControl</span>
+            <div className="flex items-center gap-3">
+              <img src={logo} alt="Parabellum Smart Check" className="h-10 w-10" />
+              <span className="text-xl font-bold text-foreground">Parabellum Smart Check</span>
             </div>
             <nav className="hidden md:flex items-center gap-6">
               <a href="#caracteristicas" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Características</a>
