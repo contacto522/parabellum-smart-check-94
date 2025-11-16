@@ -162,7 +162,7 @@ export default function Dashboard() {
 
           {/* Administración de Plantas */}
           {hasRole('admin_seguridad') && (
-            <Card className="hover:shadow-glow transition-all cursor-pointer">
+            <Card className="hover:shadow-glow transition-all cursor-pointer" onClick={() => navigate('/admin/plants')}>
               <CardHeader>
                 <Building className="w-10 h-10 text-primary mb-2" />
                 <CardTitle>Gestión de Plantas</CardTitle>
