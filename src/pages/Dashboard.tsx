@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Shield, LogOut, Users, FileSearch, AlertTriangle, Building } from 'lucide-react';
-import logo from '@/assets/logo-parabellum.png';
 
 export default function Dashboard() {
   const { user, loading, signOut, userRoles, hasRole } = useAuth();
@@ -38,7 +37,7 @@ export default function Dashboard() {
       <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src={logo} alt="Parabellum Smart Check" className="w-10 h-10" />
+            <Shield className="w-10 h-10 text-primary" />
             <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
               Parabellum Smart Check
             </h1>
