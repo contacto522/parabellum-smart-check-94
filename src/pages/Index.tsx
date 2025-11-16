@@ -1,6 +1,7 @@
-import { Shield, Eye, Brain, Users, CheckCircle2, AlertTriangle, Lock, Wifi, Activity, TrendingUp, FileCheck, Search } from "lucide-react";
+import { Shield, Eye, Brain, Users, CheckCircle2, AlertTriangle, Lock, Wifi, Activity, TrendingUp, FileCheck, Search, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Link } from "react-router-dom";
 import heroImage from "@/assets/hero-security.jpg";
 
 const Index = () => {
@@ -18,7 +19,12 @@ const Index = () => {
               <a href="#caracteristicas" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Características</a>
               <a href="#modulos" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Módulos</a>
               <a href="#beneficios" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Beneficios</a>
-              <Button variant="hero" size="sm">Solicitar Demo</Button>
+              <Link to="/auth">
+                <Button variant="hero" size="sm">
+                  <LogIn className="w-4 h-4 mr-2" />
+                  Iniciar Sesión
+                </Button>
+              </Link>
             </nav>
           </div>
         </div>
@@ -45,9 +51,11 @@ const Index = () => {
               Validación de identidad, trazabilidad y análisis con IA en una plataforma unificada.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button variant="hero" size="lg" className="text-lg">
-                Solicitar Demostración
-              </Button>
+              <Link to="/auth">
+                <Button variant="hero" size="lg" className="text-lg">
+                  Iniciar Sesión a la Plataforma
+                </Button>
+              </Link>
               <Button variant="hero-outline" size="lg" className="text-lg">
                 Ver Características
               </Button>
