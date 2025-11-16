@@ -57,7 +57,7 @@ const Index = () => {
                 </Button>
               </Link>
               <Button variant="hero-outline" size="lg" className="text-lg">
-                Ver Características
+                Solicitar Demostración
               </Button>
             </div>
           </div>
