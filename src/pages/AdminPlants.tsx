@@ -31,7 +31,11 @@ const plants = [
     accessControl: {
       name: 'Juan Andrés Perez Perez',
       status: 'critical',
-      message: 'Checkeado alerta grave - Registros por homicidio, robo con intimidación'
+      message: 'Checkeado alerta grave - Registros por homicidio, robo con intimidación',
+      shiftChange: {
+        hasNovelties: true,
+        novelties: ['No funciona cámara de acceso', 'Falta registro de turno anterior']
+      }
     }
   },
   { 
@@ -52,7 +56,11 @@ const plants = [
     accessControl: {
       name: 'Antonio Andrés Alvarado Alvarado',
       status: 'safe',
-      message: 'Checkeado sin registros penales'
+      message: 'Checkeado sin registros penales',
+      shiftChange: {
+        hasNovelties: false,
+        novelties: []
+      }
     }
   },
   { 
@@ -73,7 +81,11 @@ const plants = [
     accessControl: {
       name: 'María Fernanda González Torres',
       status: 'warning',
-      message: 'Checkeado alerta media - Verificación de antecedentes pendiente'
+      message: 'Checkeado alerta media - Verificación de antecedentes pendiente',
+      shiftChange: {
+        hasNovelties: true,
+        novelties: ['Sistema de registro presenta intermitencia']
+      }
     }
   },
 ];
@@ -369,13 +381,39 @@ export default function AdminPlants() {
                                 'bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-900'
                               }`}>
                                 <p className="text-sm font-medium mb-1">{plant.accessControl.name}</p>
-                                <p className={`text-xs ${
+                                <p className={`text-xs mb-2 ${
                                   plant.accessControl.status === 'critical' ? 'text-red-700 dark:text-red-300' :
                                   plant.accessControl.status === 'warning' ? 'text-yellow-700 dark:text-yellow-300' :
                                   'text-green-700 dark:text-green-300'
                                 }`}>
                                   {plant.accessControl.message}
                                 </p>
+                                
+                                {/* Cambio de Turno - Novedades */}
+                                <div className="mt-3 pt-2 border-t border-current/10">
+                                  <div className="flex items-start gap-2">
+                                    <Clock className="w-3.5 h-3.5 mt-0.5 text-muted-foreground" />
+                                    <div className="flex-1">
+                                      <p className="text-xs font-medium mb-1">
+                                        Cambio de turno: {plant.accessControl.shiftChange.hasNovelties ? (
+                                          <span className="text-amber-600 dark:text-amber-400">Con novedad</span>
+                                        ) : (
+                                          <span className="text-green-600 dark:text-green-400">Sin novedad</span>
+                                        )}
+                                      </p>
+                                      {plant.accessControl.shiftChange.hasNovelties && plant.accessControl.shiftChange.novelties.length > 0 && (
+                                        <ul className="text-xs space-y-1 mt-2">
+                                          {plant.accessControl.shiftChange.novelties.map((novelty, idx) => (
+                                            <li key={idx} className="flex items-start gap-1.5">
+                                              <span className="text-amber-600 dark:text-amber-400 mt-0.5">•</span>
+                                              <span className="text-muted-foreground">{novelty}</span>
+                                            </li>
+                                          ))}
+                                        </ul>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
                               </div>
                             </div>
 
