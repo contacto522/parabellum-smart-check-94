@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Shield, LogOut, Users, FileSearch, AlertTriangle, Building } from 'lucide-react';
+import { Shield, LogOut, Users, FileSearch, AlertTriangle, Building, UserCog, History } from 'lucide-react';
 
 export default function Dashboard() {
   const { user, loading, signOut, userRoles, hasRole } = useAuth();
@@ -173,6 +173,42 @@ export default function Dashboard() {
               <CardContent>
                 <Button variant="hero" className="w-full">
                   Ver Plantas
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Mi Equipo de Trabajo */}
+          {hasRole('admin_seguridad') && (
+            <Card className="hover:shadow-glow transition-all cursor-pointer">
+              <CardHeader>
+                <UserCog className="w-10 h-10 text-primary mb-2" />
+                <CardTitle>Mi Equipo de Trabajo</CardTitle>
+                <CardDescription>
+                  Gestión de personal de seguridad y asignación de créditos
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button variant="hero" className="w-full">
+                  Gestionar Equipo
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Historial de Consultas RRHH */}
+          {hasRole('recursos_humanos') && (
+            <Card className="hover:shadow-glow transition-all cursor-pointer">
+              <CardHeader>
+                <History className="w-10 h-10 text-primary mb-2" />
+                <CardTitle>Historial de Consultas</CardTitle>
+                <CardDescription>
+                  Registro completo de verificaciones de personal
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button variant="hero" className="w-full">
+                  Ver Historial
                 </Button>
               </CardContent>
             </Card>
