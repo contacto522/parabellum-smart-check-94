@@ -12,9 +12,9 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const plants = [
-  { id: 1, name: 'Centro Norte', location: 'Región de Los Lagos', workers: 45, peopleInside: 120, status: 'active', alerts: 3 },
-  { id: 2, name: 'Centro Sur', location: 'Región de Aysén', workers: 38, peopleInside: 85, status: 'active', alerts: 0 },
-  { id: 3, name: 'Centro Austral', location: 'Región de Magallanes', workers: 52, peopleInside: 98, status: 'maintenance', alerts: 1 },
+  { id: 1, name: 'Centro Norte', location: 'Región de Los Lagos', workers: 45, peopleInside: 120, status: 'active', alerts: 3, securityStatus: 'critical' },
+  { id: 2, name: 'Centro Sur', location: 'Región de Aysén', workers: 38, peopleInside: 85, status: 'active', alerts: 0, securityStatus: 'safe' },
+  { id: 3, name: 'Centro Austral', location: 'Región de Magallanes', workers: 52, peopleInside: 98, status: 'maintenance', alerts: 1, securityStatus: 'warning' },
 ];
 
 const recentAlerts = [
@@ -177,15 +177,50 @@ export default function AdminPlants() {
                     
                     <div className="grid gap-4">
                       {plants.map((plant) => (
-                        <Card key={plant.id} className="hover:shadow-lg transition-shadow cursor-pointer">
-                          <CardHeader className="pb-3">
+                        <Card key={plant.id} className="hover:shadow-lg transition-shadow cursor-pointer relative overflow-hidden">
+                          {/* Barra lateral de estado de seguridad */}
+                          <div className={`absolute left-0 top-0 bottom-0 w-2 ${
+                            plant.securityStatus === 'critical' ? 'bg-red-600' :
+                            plant.securityStatus === 'warning' ? 'bg-yellow-500' :
+                            'bg-green-500'
+                          }`} />
+                          
+                          <CardHeader className="pb-3 pl-6">
                             <div className="flex items-start justify-between">
                               <div className="flex items-center gap-3">
-                                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                                  <Building className="w-6 h-6 text-primary" />
+                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                                  plant.securityStatus === 'critical' ? 'bg-red-600/10' :
+                                  plant.securityStatus === 'warning' ? 'bg-yellow-500/10' :
+                                  'bg-green-500/10'
+                                }`}>
+                                  <Building className={`w-6 h-6 ${
+                                    plant.securityStatus === 'critical' ? 'text-red-600' :
+                                    plant.securityStatus === 'warning' ? 'text-yellow-600' :
+                                    'text-green-600'
+                                  }`} />
                                 </div>
                                 <div>
-                                  <CardTitle className="text-base">{plant.name}</CardTitle>
+                                  <div className="flex items-center gap-2">
+                                    <CardTitle className="text-base">{plant.name}</CardTitle>
+                                    {/* Badge de estado de seguridad */}
+                                    <Badge 
+                                      variant="outline"
+                                      className={`border-2 ${
+                                        plant.securityStatus === 'critical' ? 'border-red-600 text-red-600 bg-red-600/5' :
+                                        plant.securityStatus === 'warning' ? 'border-yellow-500 text-yellow-700 bg-yellow-500/5' :
+                                        'border-green-500 text-green-700 bg-green-500/5'
+                                      }`}
+                                    >
+                                      <div className={`w-2 h-2 rounded-full mr-1.5 ${
+                                        plant.securityStatus === 'critical' ? 'bg-red-600' :
+                                        plant.securityStatus === 'warning' ? 'bg-yellow-500' :
+                                        'bg-green-500'
+                                      }`} />
+                                      {plant.securityStatus === 'critical' ? 'Crítico' :
+                                       plant.securityStatus === 'warning' ? 'Alerta' :
+                                       'Seguro'}
+                                    </Badge>
+                                  </div>
                                   <CardDescription className="flex items-center gap-1 mt-1">
                                     <MapPin className="w-3 h-3" />
                                     {plant.location}
@@ -197,7 +232,7 @@ export default function AdminPlants() {
                               </Badge>
                             </div>
                           </CardHeader>
-                          <CardContent className="space-y-4">
+                          <CardContent className="space-y-4 pl-6">
                             <div className="flex items-center justify-between text-sm">
                               <div className="flex items-center gap-4">
                                 <div className="flex items-center gap-2">
@@ -350,6 +385,32 @@ export default function AdminPlants() {
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-muted-foreground">Verificaciones Hoy</span>
                         <span className="text-lg font-bold text-primary">28</span>
+                      </div>
+                      <div className="pt-4 border-t border-border">
+                        <h4 className="text-sm font-medium mb-3">Estado de Seguridad Global</h4>
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <div className="w-3 h-3 rounded-full bg-red-600" />
+                              <span className="text-sm">Crítico</span>
+                            </div>
+                            <span className="text-sm font-bold text-red-600">1</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                              <span className="text-sm">Alerta</span>
+                            </div>
+                            <span className="text-sm font-bold text-yellow-600">1</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <div className="w-3 h-3 rounded-full bg-green-500" />
+                              <span className="text-sm">Seguro</span>
+                            </div>
+                            <span className="text-sm font-bold text-green-600">1</span>
+                          </div>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
