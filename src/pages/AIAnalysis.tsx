@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Send, Paperclip, Search, Globe, SearchCheck } from "lucide-react";
+import { ArrowLeft, Send, Paperclip, Search, Globe } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import detectiveIcon from "@/assets/detective-icon.png";
 
 interface Message {
   role: "user" | "assistant";
@@ -81,8 +82,12 @@ const AIAnalysis = () => {
         <Card className="border-primary/20">
           <CardHeader className="text-center pb-4">
             <div className="flex justify-center mb-4">
-              <div className="w-20 h-20 bg-gradient-primary rounded-full flex items-center justify-center shadow-elegant">
-                <SearchCheck className="w-10 h-10 text-primary-foreground" />
+              <div className="w-24 h-24 flex items-center justify-center">
+                <img 
+                  src={detectiveIcon} 
+                  alt="Detective" 
+                  className="w-full h-full object-contain"
+                />
               </div>
             </div>
             <CardTitle>¿Qué investigaremos hoy?</CardTitle>
