@@ -144,7 +144,7 @@ export default function Dashboard() {
 
           {/* Análisis IA */}
           {(hasRole('admin_seguridad') || hasRole('recursos_humanos')) && (
-            <Card className="hover:shadow-glow transition-all cursor-pointer">
+            <Card className="hover:shadow-glow transition-all cursor-pointer" onClick={() => navigate('/ai/analysis')}>
               <CardHeader>
                 <FileSearch className="w-10 h-10 text-primary mb-2" />
                 <CardTitle>Análisis con IA</CardTitle>
