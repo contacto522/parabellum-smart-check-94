@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-import { Shield, Building, AlertTriangle, Users, FileSearch, TrendingUp, MapPin, Activity, Clock, Search } from 'lucide-react';
+import { Shield, Building, AlertTriangle, Users, FileSearch, TrendingUp, MapPin, Activity, Clock, Search, UserCheck } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,7 @@ import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGrou
 import { NavLink } from '@/components/NavLink';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
 const plants = [
   { 
@@ -21,6 +22,12 @@ const plants = [
     status: 'active', 
     alerts: 3, 
     securityStatus: 'critical',
+    plantManager: {
+      name: 'Carlos Andrés Muñoz Sepúlveda',
+      rut: '16.234.567-8',
+      phone: '+56 9 8765 4321',
+      email: 'carlos.munoz@parabellum.cl'
+    },
     accessControl: {
       name: 'Juan Andrés Perez Perez',
       status: 'critical',
@@ -36,6 +43,12 @@ const plants = [
     status: 'active', 
     alerts: 0, 
     securityStatus: 'safe',
+    plantManager: {
+      name: 'María José Valenzuela Rojas',
+      rut: '15.876.543-2',
+      phone: '+56 9 7654 3210',
+      email: 'maria.valenzuela@parabellum.cl'
+    },
     accessControl: {
       name: 'Antonio Andrés Alvarado Alvarado',
       status: 'safe',
@@ -51,6 +64,12 @@ const plants = [
     status: 'maintenance', 
     alerts: 1, 
     securityStatus: 'warning',
+    plantManager: {
+      name: 'Pedro Luis Contreras Vega',
+      rut: '14.567.890-1',
+      phone: '+56 9 6543 2109',
+      email: 'pedro.contreras@parabellum.cl'
+    },
     accessControl: {
       name: 'María Fernanda González Torres',
       status: 'warning',
@@ -294,11 +313,55 @@ export default function AdminPlants() {
                               )}
                             </div>
 
-                            {/* Control de Acceso */}
+                            {/* Encargado de Planta */}
+                            <div className="pt-3 border-t border-border">
+                              <div className="flex items-center justify-between mb-2">
+                                <h4 className="text-sm font-medium flex items-center gap-2">
+                                  <UserCheck className="w-4 h-4 text-muted-foreground" />
+                                  Encargado de Planta
+                                </h4>
+                                <Dialog>
+                                  <DialogTrigger asChild>
+                                    <Button variant="outline" size="sm">
+                                      Ver Ficha
+                                    </Button>
+                                  </DialogTrigger>
+                                  <DialogContent>
+                                    <DialogHeader>
+                                      <DialogTitle>Ficha del Encargado de Planta</DialogTitle>
+                                      <DialogDescription>
+                                        {plant.name}
+                                      </DialogDescription>
+                                    </DialogHeader>
+                                    <div className="space-y-4 py-4">
+                                      <div className="space-y-2">
+                                        <label className="text-sm font-medium text-muted-foreground">Nombre Completo</label>
+                                        <p className="text-sm">{plant.plantManager.name}</p>
+                                      </div>
+                                      <div className="space-y-2">
+                                        <label className="text-sm font-medium text-muted-foreground">RUT</label>
+                                        <p className="text-sm">{plant.plantManager.rut}</p>
+                                      </div>
+                                      <div className="space-y-2">
+                                        <label className="text-sm font-medium text-muted-foreground">Teléfono Celular</label>
+                                        <p className="text-sm">{plant.plantManager.phone}</p>
+                                      </div>
+                                      <div className="space-y-2">
+                                        <label className="text-sm font-medium text-muted-foreground">Correo Electrónico</label>
+                                        <p className="text-sm">{plant.plantManager.email}</p>
+                                      </div>
+                                    </div>
+                                  </DialogContent>
+                                </Dialog>
+                              </div>
+                              <p className="text-sm text-muted-foreground">{plant.plantManager.name}</p>
+                            </div>
+
+                            {/* Control de Acceso - Turno Actual */}
                             <div className="pt-3 border-t border-border">
                               <h4 className="text-sm font-medium mb-2 flex items-center gap-2">
                                 <Users className="w-4 h-4 text-muted-foreground" />
-                                Control de Acceso
+                                Turno - Control de Acceso
                               </h4>
                               <div className={`p-3 rounded-lg border ${
                                 plant.accessControl.status === 'critical' ? 'bg-red-50 border-red-200 dark:bg-red-950/20 dark:border-red-900' :
