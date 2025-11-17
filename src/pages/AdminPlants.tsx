@@ -12,15 +12,23 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const plants = [
-  { id: 1, name: 'Centro Norte', location: 'Región de Los Lagos', workers: 45, status: 'active', alerts: 2 },
-  { id: 2, name: 'Centro Sur', location: 'Región de Aysén', workers: 38, status: 'active', alerts: 0 },
-  { id: 3, name: 'Centro Austral', location: 'Región de Magallanes', workers: 52, status: 'maintenance', alerts: 1 },
+  { id: 1, name: 'Centro Norte', location: 'Región de Los Lagos', workers: 45, peopleInside: 120, status: 'active', alerts: 3 },
+  { id: 2, name: 'Centro Sur', location: 'Región de Aysén', workers: 38, peopleInside: 85, status: 'active', alerts: 0 },
+  { id: 3, name: 'Centro Austral', location: 'Región de Magallanes', workers: 52, peopleInside: 98, status: 'maintenance', alerts: 1 },
 ];
 
 const recentAlerts = [
-  { id: 1, type: 'high', plant: 'Centro Norte', message: 'Acceso no autorizado detectado', time: '2 horas' },
-  { id: 2, type: 'medium', plant: 'Centro Norte', message: 'Cambio de turno sin registro', time: '4 horas' },
-  { id: 3, type: 'high', plant: 'Centro Austral', message: 'Verificación de antecedentes pendiente', time: '6 horas' },
+  { 
+    id: 1, 
+    type: 'critical', 
+    plant: 'Centro Norte', 
+    message: 'Ingreso a planta de Juan Andrés Perez Perez con registros penales por homicidio y robo con intimidación', 
+    time: '15 minutos',
+    severity: 'grave'
+  },
+  { id: 2, type: 'high', plant: 'Centro Norte', message: 'Acceso no autorizado detectado', time: '2 horas' },
+  { id: 3, type: 'medium', plant: 'Centro Norte', message: 'Cambio de turno sin registro', time: '4 horas' },
+  { id: 4, type: 'high', plant: 'Centro Austral', message: 'Verificación de antecedentes pendiente', time: '6 horas' },
 ];
 
 const recentActivities = [
@@ -189,12 +197,16 @@ export default function AdminPlants() {
                               </Badge>
                             </div>
                           </CardHeader>
-                          <CardContent>
+                          <CardContent className="space-y-4">
                             <div className="flex items-center justify-between text-sm">
                               <div className="flex items-center gap-4">
                                 <div className="flex items-center gap-2">
                                   <Users className="w-4 h-4 text-muted-foreground" />
                                   <span>{plant.workers} trabajadores</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Activity className="w-4 h-4 text-primary" />
+                                  <span className="font-semibold text-primary">{plant.peopleInside} personas al interior</span>
                                 </div>
                               </div>
                               {plant.alerts > 0 && (
@@ -204,6 +216,39 @@ export default function AdminPlants() {
                                 </div>
                               )}
                             </div>
+
+                            {/* Eventos de Seguridad por Planta */}
+                            {plant.alerts > 0 && (
+                              <div className="pt-3 border-t border-border">
+                                <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
+                                  <Shield className="w-4 h-4 text-destructive" />
+                                  Eventos de Seguridad
+                                </h4>
+                                <div className="space-y-2">
+                                  {recentAlerts
+                                    .filter(alert => alert.plant === plant.name)
+                                    .map(alert => (
+                                      <Alert 
+                                        key={alert.id} 
+                                        variant={alert.type === 'critical' || alert.severity === 'grave' ? 'destructive' : 'default'}
+                                        className={alert.severity === 'grave' ? 'border-2 border-destructive' : ''}
+                                      >
+                                        <AlertDescription className="text-xs">
+                                          {alert.severity === 'grave' && (
+                                            <Badge variant="destructive" className="text-xs mb-1">
+                                              DELITO GRAVE
+                                            </Badge>
+                                          )}
+                                          <p className="font-medium">{alert.message}</p>
+                                          <span className="block text-muted-foreground mt-1">
+                                            Hace {alert.time}
+                                          </span>
+                                        </AlertDescription>
+                                      </Alert>
+                                    ))}
+                                </div>
+                              </div>
+                            )}
                           </CardContent>
                         </Card>
                       ))}
@@ -253,14 +298,23 @@ export default function AdminPlants() {
                         <AlertTriangle className="w-5 h-5 text-destructive" />
                         Alertas Activas
                       </CardTitle>
-                      <CardDescription>Requieren atención inmediata</CardDescription>
+                      <CardDescription>Eventos de seguridad y registros penales</CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-3">
                         {recentAlerts.map((alert) => (
-                          <Alert key={alert.id} variant={alert.type === 'high' ? 'destructive' : 'default'} className="py-3">
-                            <AlertTitle className="text-sm font-medium mb-1">
+                          <Alert 
+                            key={alert.id} 
+                            variant={alert.type === 'critical' || alert.severity === 'grave' || alert.type === 'high' ? 'destructive' : 'default'} 
+                            className={`py-3 ${alert.severity === 'grave' ? 'border-2 border-destructive' : ''}`}
+                          >
+                            <AlertTitle className="text-sm font-medium mb-1 flex items-center gap-2">
                               {alert.plant}
+                              {alert.severity === 'grave' && (
+                                <Badge variant="destructive" className="text-xs">
+                                  DELITO GRAVE
+                                </Badge>
+                              )}
                             </AlertTitle>
                             <AlertDescription className="text-xs">
                               {alert.message}
@@ -286,8 +340,12 @@ export default function AdminPlants() {
                         <span className="text-lg font-bold">135</span>
                       </div>
                       <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">Personas al Interior</span>
+                        <span className="text-lg font-bold text-primary">303</span>
+                      </div>
+                      <div className="flex items-center justify-between">
                         <span className="text-sm text-muted-foreground">Alertas Activas</span>
-                        <span className="text-lg font-bold text-destructive">3</span>
+                        <span className="text-lg font-bold text-destructive">4</span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-muted-foreground">Verificaciones Hoy</span>
