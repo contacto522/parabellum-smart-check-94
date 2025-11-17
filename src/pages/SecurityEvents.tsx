@@ -5,8 +5,21 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Upload, AlertCircle, AlertTriangle, Info } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Upload, AlertCircle, AlertTriangle, Info, Filter } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+
+interface SecurityEvent {
+  id: string;
+  title: string;
+  description: string;
+  riskLevel: string;
+  plantId: string;
+  plantName: string;
+  date: string;
+  files: string[];
+}
 
 const SecurityEvents = () => {
   const { toast } = useToast();
@@ -15,6 +28,23 @@ const SecurityEvents = () => {
   const [riskLevel, setRiskLevel] = useState<string>("");
   const [selectedPlant, setSelectedPlant] = useState<string>("");
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
+  
+  const [events, setEvents] = useState<SecurityEvent[]>([
+    {
+      id: "1",
+      title: "Robo de computadores en sector 1",
+      description: "El día de hoy sujeto desconocido rompe el candado y roba 3 computadores",
+      riskLevel: "grave",
+      plantId: "1",
+      plantName: "Centro Norte",
+      date: "2024-01-15",
+      files: ["informe_robo.pdf"]
+    }
+  ]);
+  
+  const [filterPlant, setFilterPlant] = useState<string>("all");
+  const [filterRisk, setFilterRisk] = useState<string>("all");
+  const [filterDate, setFilterDate] = useState<string>("");
 
   const plants = [
     { id: "1", name: "Centro Norte" },
@@ -41,6 +71,19 @@ const SecurityEvents = () => {
       return;
     }
 
+    const newEvent: SecurityEvent = {
+      id: Date.now().toString(),
+      title: eventTitle,
+      description: eventDescription,
+      riskLevel,
+      plantId: selectedPlant,
+      plantName: plants.find(p => p.id === selectedPlant)?.name || "",
+      date: new Date().toISOString().split('T')[0],
+      files: attachedFiles.map(f => f.name)
+    };
+
+    setEvents([newEvent, ...events]);
+
     toast({
       title: "Evento registrado",
       description: "El evento de seguridad ha sido registrado exitosamente",
@@ -52,6 +95,33 @@ const SecurityEvents = () => {
     setRiskLevel("");
     setSelectedPlant("");
     setAttachedFiles([]);
+  };
+
+  const filteredEvents = events.filter(event => {
+    if (filterPlant !== "all" && event.plantId !== filterPlant) return false;
+    if (filterRisk !== "all" && event.riskLevel !== filterRisk) return false;
+    if (filterDate && event.date !== filterDate) return false;
+    return true;
+  });
+
+  const getRiskBadge = (level: string) => {
+    const variants = {
+      grave: "destructive",
+      medio: "default",
+      bajo: "secondary"
+    } as const;
+    
+    const labels = {
+      grave: "Riesgo Grave",
+      medio: "Riesgo Medio",
+      bajo: "Riesgo Bajo"
+    };
+
+    return (
+      <Badge variant={variants[level as keyof typeof variants]}>
+        {labels[level as keyof typeof labels]}
+      </Badge>
+    );
   };
 
   const getRiskIcon = (level: string) => {
@@ -69,8 +139,8 @@ const SecurityEvents = () => {
 
   return (
     <div className="min-h-screen bg-background p-6">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-foreground mb-6">Panel de Eventos de Seguridad</h1>
+      <div className="max-w-7xl mx-auto space-y-6">
+        <h1 className="text-3xl font-bold text-foreground">Panel de Eventos de Seguridad</h1>
         
         <Card>
           <CardHeader>
@@ -187,6 +257,100 @@ const SecurityEvents = () => {
                 Registrar Evento
               </Button>
             </form>
+          </CardContent>
+        </Card>
+
+        {/* Tabla de Eventos Registrados */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Filter className="h-5 w-5" />
+              Eventos de Seguridad Registrados
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Filtros */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="filterPlant">Filtrar por Planta</Label>
+                <Select value={filterPlant} onValueChange={setFilterPlant}>
+                  <SelectTrigger id="filterPlant">
+                    <SelectValue placeholder="Todas las plantas" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todas las plantas</SelectItem>
+                    {plants.map((plant) => (
+                      <SelectItem key={plant.id} value={plant.id}>
+                        {plant.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="filterRisk">Filtrar por Nivel de Riesgo</Label>
+                <Select value={filterRisk} onValueChange={setFilterRisk}>
+                  <SelectTrigger id="filterRisk">
+                    <SelectValue placeholder="Todos los niveles" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos los niveles</SelectItem>
+                    <SelectItem value="grave">Riesgo Grave</SelectItem>
+                    <SelectItem value="medio">Riesgo Medio</SelectItem>
+                    <SelectItem value="bajo">Riesgo Bajo</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="filterDate">Filtrar por Fecha</Label>
+                <Input
+                  id="filterDate"
+                  type="date"
+                  value={filterDate}
+                  onChange={(e) => setFilterDate(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* Tabla */}
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Fecha</TableHead>
+                    <TableHead>Título</TableHead>
+                    <TableHead>Descripción</TableHead>
+                    <TableHead>Planta</TableHead>
+                    <TableHead>Nivel de Riesgo</TableHead>
+                    <TableHead>Archivos</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredEvents.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center text-muted-foreground">
+                        No se encontraron eventos que coincidan con los filtros
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    filteredEvents.map((event) => (
+                      <TableRow key={event.id}>
+                        <TableCell className="font-medium">{event.date}</TableCell>
+                        <TableCell>{event.title}</TableCell>
+                        <TableCell className="max-w-xs truncate">{event.description}</TableCell>
+                        <TableCell>{event.plantName}</TableCell>
+                        <TableCell>{getRiskBadge(event.riskLevel)}</TableCell>
+                        <TableCell className="text-sm text-muted-foreground">
+                          {event.files.length > 0 ? `${event.files.length} archivo(s)` : "Sin archivos"}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           </CardContent>
         </Card>
       </div>
