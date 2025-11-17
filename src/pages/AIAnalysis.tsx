@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Send, Paperclip, Search, Globe, Sparkles } from "lucide-react";
+import { ArrowLeft, Send, Paperclip, Search, Globe, Brain } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Message {
@@ -82,10 +82,10 @@ const AIAnalysis = () => {
           <CardHeader className="text-center pb-4">
             <div className="flex justify-center mb-4">
               <div className="w-20 h-20 bg-gradient-primary rounded-full flex items-center justify-center shadow-elegant">
-                <Sparkles className="w-10 h-10 text-primary-foreground" />
+                <Brain className="w-10 h-10 text-primary-foreground" />
               </div>
             </div>
-            <CardTitle>Análisis de Seguridad</CardTitle>
+            <CardTitle>¿Qué investigaremos hoy?</CardTitle>
           </CardHeader>
 
           <CardContent className="space-y-4">
@@ -164,7 +164,7 @@ const AIAnalysis = () => {
                   <Paperclip className="w-4 h-4" />
                 </Button>
                 <Input
-                  placeholder="Escribe tus instrucciones aquí..."
+                  placeholder="Busca información de personas, eventos u otros"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && handleSend()}
