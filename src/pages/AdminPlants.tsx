@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-import { Shield, Building, AlertTriangle, Users, FileSearch, TrendingUp, MapPin, Activity, Clock, Search, UserCheck } from 'lucide-react';
+import { Shield, Building, AlertTriangle, Users, FileSearch, TrendingUp, MapPin, Activity, Clock, Search, UserCheck, AlertCircle } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -20,7 +20,7 @@ const plants = [
     workers: 45, 
     peopleInside: 120, 
     status: 'active', 
-    alerts: 3, 
+    alerts: 1, 
     securityStatus: 'critical',
     plantManager: {
       name: 'Carlos Andrés Muñoz Sepúlveda',
@@ -90,18 +90,17 @@ const plants = [
   },
 ];
 
-const recentAlerts = [
+const initialAlerts = [
   { 
     id: 1, 
     type: 'critical', 
     plant: 'Centro Norte', 
-    message: 'Ingreso a planta de Juan Andrés Perez Perez con registros penales por homicidio y robo con intimidación', 
+    message: 'Ingreso a planta Centro Norte de Juan Andrés Perez Perez, con registros penales por homicidio y robo con intimidación', 
     time: '15 minutos',
-    severity: 'grave'
+    severity: 'grave',
+    resolved: false
   },
-  { id: 2, type: 'high', plant: 'Centro Norte', message: 'Acceso no autorizado detectado', time: '2 horas' },
-  { id: 3, type: 'medium', plant: 'Centro Norte', message: 'Cambio de turno sin registro', time: '4 horas' },
-  { id: 4, type: 'high', plant: 'Centro Austral', message: 'Verificación de antecedentes pendiente', time: '6 horas' },
+  { id: 4, type: 'high', plant: 'Centro Austral', message: 'Verificación de antecedentes pendiente', time: '6 horas', resolved: false },
 ];
 
 const recentActivities = [
@@ -114,6 +113,15 @@ export default function AdminPlants() {
   const { user, signOut, userRoles, hasRole } = useAuth();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
+  const [alerts, setAlerts] = useState(initialAlerts);
+
+  const toggleAlertResolved = (alertId: number) => {
+    setAlerts(prevAlerts => 
+      prevAlerts.map(alert => 
+        alert.id === alertId ? { ...alert, resolved: !alert.resolved } : alert
+      )
+    );
+  };
 
   if (!user) {
     navigate('/auth');
@@ -419,24 +427,32 @@ export default function AdminPlants() {
                                   Eventos de Seguridad
                                 </h4>
                                 <div className="space-y-2">
-                                  {recentAlerts
+                                  {alerts
                                     .filter(alert => alert.plant === plant.name)
                                     .map(alert => (
                                       <Alert 
                                         key={alert.id} 
                                         variant={alert.type === 'critical' || alert.severity === 'grave' ? 'destructive' : 'default'}
-                                        className={alert.severity === 'grave' ? 'border-2 border-destructive' : ''}
+                                        className={`${alert.severity === 'grave' ? 'border-2 border-destructive' : ''} ${alert.resolved ? 'opacity-60' : ''}`}
                                       >
+                                        <AlertCircle className="h-4 w-4" />
                                         <AlertDescription className="text-xs">
-                                          {alert.severity === 'grave' && (
-                                            <Badge variant="destructive" className="text-xs mb-1">
-                                              DELITO GRAVE
-                                            </Badge>
-                                          )}
-                                          <p className="font-medium">{alert.message}</p>
-                                          <span className="block text-muted-foreground mt-1">
-                                            Hace {alert.time}
-                                          </span>
+                                          <div className="flex items-start justify-between gap-3">
+                                            <div className="flex-1">
+                                              <p className="font-medium">{alert.message}</p>
+                                              <span className="block text-muted-foreground mt-1">
+                                                Hace {alert.time}
+                                              </span>
+                                            </div>
+                                            <Button
+                                              size="sm"
+                                              variant={alert.resolved ? "outline" : "default"}
+                                              className="shrink-0 h-7 text-xs"
+                                              onClick={() => toggleAlertResolved(alert.id)}
+                                            >
+                                              {alert.resolved ? "Resuelta" : "Marcar resuelta"}
+                                            </Button>
+                                          </div>
                                         </AlertDescription>
                                       </Alert>
                                     ))}
@@ -496,26 +512,34 @@ export default function AdminPlants() {
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-3">
-                        {recentAlerts.map((alert) => (
+                        {alerts.map((alert) => (
                           <Alert 
                             key={alert.id} 
                             variant={alert.type === 'critical' || alert.severity === 'grave' || alert.type === 'high' ? 'destructive' : 'default'} 
-                            className={`py-3 ${alert.severity === 'grave' ? 'border-2 border-destructive' : ''}`}
+                            className={`py-3 ${alert.severity === 'grave' ? 'border-2 border-destructive' : ''} ${alert.resolved ? 'opacity-60' : ''}`}
                           >
-                            <AlertTitle className="text-sm font-medium mb-1 flex items-center gap-2">
-                              {alert.plant}
-                              {alert.severity === 'grave' && (
-                                <Badge variant="destructive" className="text-xs">
-                                  DELITO GRAVE
-                                </Badge>
-                              )}
-                            </AlertTitle>
-                            <AlertDescription className="text-xs">
-                              {alert.message}
-                            </AlertDescription>
-                            <div className="flex items-center gap-1 mt-2 text-xs opacity-80">
-                              <Clock className="w-3 h-3" />
-                              Hace {alert.time}
+                            <AlertCircle className="h-4 w-4" />
+                            <div className="space-y-2">
+                              <AlertTitle className="text-sm font-medium">
+                                {alert.plant}
+                              </AlertTitle>
+                              <AlertDescription className="text-xs">
+                                {alert.message}
+                              </AlertDescription>
+                              <div className="flex items-center justify-between gap-2 mt-2">
+                                <div className="flex items-center gap-1 text-xs opacity-80">
+                                  <Clock className="w-3 h-3" />
+                                  Hace {alert.time}
+                                </div>
+                                <Button
+                                  size="sm"
+                                  variant={alert.resolved ? "outline" : "default"}
+                                  className="h-6 text-xs"
+                                  onClick={() => toggleAlertResolved(alert.id)}
+                                >
+                                  {alert.resolved ? "Resuelta" : "Marcar resuelta"}
+                                </Button>
+                              </div>
                             </div>
                           </Alert>
                         ))}
