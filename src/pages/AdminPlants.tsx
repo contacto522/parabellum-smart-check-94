@@ -12,9 +12,51 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const plants = [
-  { id: 1, name: 'Centro Norte', location: 'Región de Los Lagos', workers: 45, peopleInside: 120, status: 'active', alerts: 3, securityStatus: 'critical' },
-  { id: 2, name: 'Centro Sur', location: 'Región de Aysén', workers: 38, peopleInside: 85, status: 'active', alerts: 0, securityStatus: 'safe' },
-  { id: 3, name: 'Centro Austral', location: 'Región de Magallanes', workers: 52, peopleInside: 98, status: 'maintenance', alerts: 1, securityStatus: 'warning' },
+  { 
+    id: 1, 
+    name: 'Centro Norte', 
+    location: 'Región de Los Lagos', 
+    workers: 45, 
+    peopleInside: 120, 
+    status: 'active', 
+    alerts: 3, 
+    securityStatus: 'critical',
+    accessControl: {
+      name: 'Juan Andrés Perez Perez',
+      status: 'critical',
+      message: 'Checkeado alerta grave - Registros por homicidio, robo con intimidación'
+    }
+  },
+  { 
+    id: 2, 
+    name: 'Centro Sur', 
+    location: 'Región de Aysén', 
+    workers: 38, 
+    peopleInside: 85, 
+    status: 'active', 
+    alerts: 0, 
+    securityStatus: 'safe',
+    accessControl: {
+      name: 'Antonio Andrés Alvarado Alvarado',
+      status: 'safe',
+      message: 'Checkeado sin registros penales'
+    }
+  },
+  { 
+    id: 3, 
+    name: 'Centro Austral', 
+    location: 'Región de Magallanes', 
+    workers: 52, 
+    peopleInside: 98, 
+    status: 'maintenance', 
+    alerts: 1, 
+    securityStatus: 'warning',
+    accessControl: {
+      name: 'María Fernanda González Torres',
+      status: 'warning',
+      message: 'Checkeado alerta media - Verificación de antecedentes pendiente'
+    }
+  },
 ];
 
 const recentAlerts = [
@@ -250,6 +292,28 @@ export default function AdminPlants() {
                                   <span className="font-medium">{plant.alerts} alertas</span>
                                 </div>
                               )}
+                            </div>
+
+                            {/* Control de Acceso */}
+                            <div className="pt-3 border-t border-border">
+                              <h4 className="text-sm font-medium mb-2 flex items-center gap-2">
+                                <Users className="w-4 h-4 text-muted-foreground" />
+                                Control de Acceso
+                              </h4>
+                              <div className={`p-3 rounded-lg border ${
+                                plant.accessControl.status === 'critical' ? 'bg-red-50 border-red-200 dark:bg-red-950/20 dark:border-red-900' :
+                                plant.accessControl.status === 'warning' ? 'bg-yellow-50 border-yellow-200 dark:bg-yellow-950/20 dark:border-yellow-900' :
+                                'bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-900'
+                              }`}>
+                                <p className="text-sm font-medium mb-1">{plant.accessControl.name}</p>
+                                <p className={`text-xs ${
+                                  plant.accessControl.status === 'critical' ? 'text-red-700 dark:text-red-300' :
+                                  plant.accessControl.status === 'warning' ? 'text-yellow-700 dark:text-yellow-300' :
+                                  'text-green-700 dark:text-green-300'
+                                }`}>
+                                  {plant.accessControl.message}
+                                </p>
+                              </div>
                             </div>
 
                             {/* Eventos de Seguridad por Planta */}
