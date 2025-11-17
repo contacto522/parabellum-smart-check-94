@@ -108,7 +108,7 @@ export default function Dashboard() {
 
           {/* Gestión de Eventos */}
           {hasRole('admin_seguridad') && (
-            <Card className="hover:shadow-glow transition-all cursor-pointer">
+            <Card className="hover:shadow-glow transition-all cursor-pointer" onClick={() => navigate('/security/events')}>
               <CardHeader>
                 <AlertTriangle className="w-10 h-10 text-primary mb-2" />
                 <CardTitle>Eventos de Seguridad</CardTitle>
