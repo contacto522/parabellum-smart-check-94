@@ -307,15 +307,9 @@ export default function AdminPlants() {
                           </CardHeader>
                           <CardContent className="space-y-4 pl-6">
                             <div className="flex items-center justify-between text-sm">
-                              <div className="flex items-center gap-4">
-                                <div className="flex items-center gap-2">
-                                  <Users className="w-4 h-4 text-muted-foreground" />
-                                  <span>{plant.workers} trabajadores</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  <Activity className="w-4 h-4 text-primary" />
-                                  <span className="font-semibold text-primary">{plant.peopleInside} personas al interior</span>
-                                </div>
+                              <div className="flex items-center gap-2">
+                                <Activity className="w-4 h-4 text-primary" />
+                                <span className="font-semibold text-primary">{plant.peopleInside} personas al interior</span>
                               </div>
                               {plant.alerts > 0 && (
                                 <div className="flex items-center gap-2 text-destructive">
