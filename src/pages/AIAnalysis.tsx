@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Send, Paperclip, Search, Globe } from "lucide-react";
+import { ArrowLeft, Send, Paperclip, Search, Globe, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Message {
@@ -81,11 +81,11 @@ const AIAnalysis = () => {
         <Card className="border-primary/20">
           <CardHeader className="text-center pb-4">
             <div className="flex justify-center mb-4">
-              <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center">
-                <span className="text-5xl">🕵️</span>
+              <div className="w-20 h-20 bg-gradient-primary rounded-full flex items-center justify-center shadow-elegant">
+                <Sparkles className="w-10 h-10 text-primary-foreground" />
               </div>
             </div>
-            <CardTitle>Detective IA - Análisis de Seguridad</CardTitle>
+            <CardTitle>Análisis de Seguridad</CardTitle>
           </CardHeader>
 
           <CardContent className="space-y-4">
@@ -93,7 +93,7 @@ const AIAnalysis = () => {
             <div className="flex gap-3 justify-center">
               <Button
                 onClick={handleOSINT}
-                variant="outline"
+                variant="secondary"
                 className="gap-2"
               >
                 <Globe className="w-4 h-4" />
@@ -101,7 +101,7 @@ const AIAnalysis = () => {
               </Button>
               <Button
                 onClick={handleSearch}
-                variant="outline"
+                variant="secondary"
                 className="gap-2"
               >
                 <Search className="w-4 h-4" />
