@@ -9,6 +9,7 @@ import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import AdminPlants from "./pages/AdminPlants";
 import SecurityEvents from "./pages/SecurityEvents";
+import AIAnalysis from "./pages/AIAnalysis";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/admin/plants" element={<AdminPlants />} />
             <Route path="/security/events" element={<SecurityEvents />} />
+            <Route path="/ai/analysis" element={<AIAnalysis />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
