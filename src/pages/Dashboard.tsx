@@ -143,17 +143,17 @@ export default function Dashboard() {
 
           {/* Recursos Humanos */}
           {hasRole('recursos_humanos') && (
-            <Card className="hover:shadow-glow transition-all cursor-pointer">
+            <Card className="hover:shadow-glow transition-all cursor-pointer" onClick={() => navigate('/recursos-humanos')}>
               <CardHeader>
                 <Users className="w-10 h-10 text-primary mb-2" />
-                <CardTitle>Verificación de Personal</CardTitle>
+                <CardTitle>Recursos Humanos</CardTitle>
                 <CardDescription>
-                  Consulta de antecedentes y postulantes
+                  Gestión y verificación de personal
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <Button variant="hero" className="w-full">
-                  Consultar
+                  Acceder
                 </Button>
               </CardContent>
             </Card>
