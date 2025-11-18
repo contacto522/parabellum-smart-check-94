@@ -68,6 +68,39 @@ export type Database = {
         }
         Relationships: []
       }
+      blocked_users: {
+        Row: {
+          block_reason: string
+          blocked_by: string | null
+          blocked_date: string
+          created_at: string
+          id: string
+          person_name: string | null
+          person_rut: string
+          updated_at: string
+        }
+        Insert: {
+          block_reason: string
+          blocked_by?: string | null
+          blocked_date?: string
+          created_at?: string
+          id?: string
+          person_name?: string | null
+          person_rut: string
+          updated_at?: string
+        }
+        Update: {
+          block_reason?: string
+          blocked_by?: string | null
+          blocked_date?: string
+          created_at?: string
+          id?: string
+          person_name?: string | null
+          person_rut?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           area: string | null

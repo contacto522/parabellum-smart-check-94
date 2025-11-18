@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Shield, LogOut, Users, FileSearch, AlertTriangle, Building, UserCog, History } from 'lucide-react';
+import { Shield, LogOut, Users, FileSearch, AlertTriangle, Building, UserCog, History, UserX } from 'lucide-react';
 
 export default function Dashboard() {
   const { user, loading, signOut, userRoles, hasRole } = useAuth();
@@ -90,20 +90,37 @@ export default function Dashboard() {
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {/* Control de Accesos */}
           {hasRole('admin_seguridad') && (
-            <Card className="hover:shadow-glow transition-all cursor-pointer" onClick={() => navigate('/access/control')}>
-              <CardHeader>
-                <Shield className="w-10 h-10 text-primary mb-2" />
-                <CardTitle>Control de Accesos</CardTitle>
-                <CardDescription>
-                  Validación de identidad y gestión de ingresos
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button variant="hero" className="w-full">
-                  Acceder
-                </Button>
-              </CardContent>
-            </Card>
+            <>
+              <Card className="hover:shadow-glow transition-all cursor-pointer" onClick={() => navigate('/access/control')}>
+                <CardHeader>
+                  <Shield className="w-10 h-10 text-primary mb-2" />
+                  <CardTitle>Control de Accesos</CardTitle>
+                  <CardDescription>
+                    Validación de identidad y gestión de ingresos
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button variant="hero" className="w-full">
+                    Acceder
+                  </Button>
+                </CardContent>
+              </Card>
+              
+              <Card className="hover:shadow-glow transition-all cursor-pointer border-destructive/50" onClick={() => navigate('/access/blocked')}>
+                <CardHeader>
+                  <UserX className="w-10 h-10 text-destructive mb-2" />
+                  <CardTitle>Lista de Bloqueados</CardTitle>
+                  <CardDescription>
+                    Gestión de usuarios con acceso restringido
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button variant="destructive" className="w-full">
+                    Gestionar
+                  </Button>
+                </CardContent>
+              </Card>
+            </>
           )}
 
           {/* Gestión de Eventos */}
