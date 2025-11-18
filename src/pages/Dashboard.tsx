@@ -90,7 +90,7 @@ export default function Dashboard() {
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {/* Control de Accesos */}
           {hasRole('admin_seguridad') && (
-            <Card className="hover:shadow-glow transition-all cursor-pointer">
+            <Card className="hover:shadow-glow transition-all cursor-pointer" onClick={() => navigate('/access/control')}>
               <CardHeader>
                 <Shield className="w-10 h-10 text-primary mb-2" />
                 <CardTitle>Control de Accesos</CardTitle>

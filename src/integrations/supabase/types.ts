@@ -14,6 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
+      access_logs: {
+        Row: {
+          company: string | null
+          created_at: string
+          created_by: string | null
+          entry_datetime: string
+          entry_notes: string | null
+          exit_datetime: string | null
+          id: string
+          observations: string | null
+          person_name: string
+          person_rut: string
+          plant_name: string
+          risk_description: string | null
+          risk_level: string
+          updated_at: string
+          vehicle_plate: string | null
+        }
+        Insert: {
+          company?: string | null
+          created_at?: string
+          created_by?: string | null
+          entry_datetime?: string
+          entry_notes?: string | null
+          exit_datetime?: string | null
+          id?: string
+          observations?: string | null
+          person_name: string
+          person_rut: string
+          plant_name: string
+          risk_description?: string | null
+          risk_level: string
+          updated_at?: string
+          vehicle_plate?: string | null
+        }
+        Update: {
+          company?: string | null
+          created_at?: string
+          created_by?: string | null
+          entry_datetime?: string
+          entry_notes?: string | null
+          exit_datetime?: string | null
+          id?: string
+          observations?: string | null
+          person_name?: string
+          person_rut?: string
+          plant_name?: string
+          risk_description?: string | null
+          risk_level?: string
+          updated_at?: string
+          vehicle_plate?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           area: string | null
