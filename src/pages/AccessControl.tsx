@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Plus, Search, X } from 'lucide-react';
+import { ArrowLeft, Plus, Search, X, Eye, Scan } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -60,7 +60,7 @@ export default function AccessControl() {
   const [formData, setFormData] = useState({
     person_rut: '',
     person_name: '',
-    risk_level: 'sin_alertas' as const,
+    risk_level: 'sin_alertas' as 'sin_alertas' | 'riesgo_medio' | 'riesgo_alto',
     risk_description: '',
     vehicle_plate: '',
     company: '',
@@ -68,6 +68,63 @@ export default function AccessControl() {
     entry_notes: '',
     plant_name: '',
   });
+
+  const [isScanning, setIsScanning] = useState(false);
+  const [hasScanned, setHasScanned] = useState(false);
+
+  // Available plants
+  const plants = [
+    'Planta Santiago Centro',
+    'Planta Maipú',
+    'Planta San Bernardo',
+    'Planta Pudahuel',
+    'Planta Quilicura',
+    'Planta La Florida',
+  ];
+
+  // Simulate ID card scanning
+  const handleScanID = () => {
+    if (!formData.person_rut || !formData.person_name) {
+      toast({
+        title: 'Datos incompletos',
+        description: 'Por favor ingrese el RUT y nombre antes de escanear',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsScanning(true);
+    
+    // Simulate scanning delay
+    setTimeout(() => {
+      // Simulate random risk assessment
+      const risks = [
+        { level: 'sin_alertas' as const, description: '' },
+        { level: 'riesgo_medio' as const, description: 'Antecedentes por falta administrativa' },
+        { level: 'riesgo_alto' as const, description: 'Registros por robo con intimidación' },
+      ];
+      
+      const randomRisk = risks[Math.floor(Math.random() * risks.length)];
+      
+      setFormData({
+        ...formData,
+        risk_level: randomRisk.level,
+        risk_description: randomRisk.description,
+      });
+      
+      setIsScanning(false);
+      setHasScanned(true);
+      
+      toast({
+        title: 'Escaneo completado',
+        description: `Nivel de riesgo: ${
+          randomRisk.level === 'sin_alertas' ? 'Sin alertas' :
+          randomRisk.level === 'riesgo_medio' ? 'Riesgo medio' : 'Riesgo alto'
+        }`,
+        variant: randomRisk.level === 'riesgo_alto' ? 'destructive' : 'default',
+      });
+    }, 1500);
+  };
 
   useEffect(() => {
     if (!loading && !user) {
@@ -171,28 +228,19 @@ export default function AccessControl() {
       entry_notes: '',
       plant_name: '',
     });
+    setHasScanned(false);
   };
 
-  const getRiskBadge = (level: string, description: string | null) => {
+  const getRiskBadge = (level: string) => {
     switch (level) {
       case 'riesgo_alto':
-        return (
-          <Badge variant="destructive" className="whitespace-normal">
-            {description || 'Riesgo Alto'}
-          </Badge>
-        );
+        return <Badge variant="destructive">Riesgo Alto</Badge>;
       case 'riesgo_medio':
-        return (
-          <Badge className="bg-amber-500 hover:bg-amber-600 whitespace-normal">
-            {description || 'Riesgo Medio'}
-          </Badge>
-        );
+        return <Badge className="bg-yellow-500 hover:bg-yellow-600 text-white">Riesgo Medio</Badge>;
+      case 'sin_alertas':
+        return <Badge className="bg-green-500 hover:bg-green-600 text-white">Sin Alertas</Badge>;
       default:
-        return (
-          <Badge variant="secondary" className="whitespace-normal">
-            Sin registros penales
-          </Badge>
-        );
+        return <Badge variant="outline">Desconocido</Badge>;
     }
   };
 
@@ -260,49 +308,58 @@ export default function AccessControl() {
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="plant_name">Planta *</Label>
-                  <Input
-                    id="plant_name"
-                    value={formData.plant_name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, plant_name: e.target.value })
-                    }
-                    placeholder="Planta Santiago Centro"
-                    required
-                  />
+                {/* Scan ID Button */}
+                <div className="space-y-2 p-4 border rounded-lg bg-muted/50">
+                  <Label>Escaneo de Cédula</Label>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Escanee la cédula de identidad para verificar antecedentes automáticamente
+                  </p>
+                  <Button
+                    type="button"
+                    onClick={handleScanID}
+                    disabled={isScanning || !formData.person_rut || !formData.person_name}
+                    className="w-full"
+                    variant="outline"
+                  >
+                    <Scan className="w-4 h-4 mr-2" />
+                    {isScanning ? 'Escaneando...' : 'Escanear Cédula'}
+                  </Button>
+                  
+                  {hasScanned && (
+                    <div className="mt-3 p-3 border rounded-lg bg-background">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">Resultado del escaneo:</span>
+                        {getRiskBadge(formData.risk_level)}
+                      </div>
+                      {formData.risk_description && (
+                        <p className="text-sm text-muted-foreground mt-2">
+                          {formData.risk_description}
+                        </p>
+                      )}
+                    </div>
+                  )}
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="risk_level">Nivel de Riesgo *</Label>
-                    <Select
-                      value={formData.risk_level}
-                      onValueChange={(value: any) =>
-                        setFormData({ ...formData, risk_level: value })
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="sin_alertas">Sin Alertas</SelectItem>
-                        <SelectItem value="riesgo_medio">Riesgo Medio</SelectItem>
-                        <SelectItem value="riesgo_alto">Riesgo Alto</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="risk_description">Descripción del Riesgo</Label>
-                    <Input
-                      id="risk_description"
-                      value={formData.risk_description}
-                      onChange={(e) =>
-                        setFormData({ ...formData, risk_description: e.target.value })
-                      }
-                      placeholder="Ej: Registros por robo con intimidación"
-                    />
-                  </div>
+                <div className="space-y-2">
+                  <Label htmlFor="plant_name">Planta *</Label>
+                  <Select
+                    value={formData.plant_name}
+                    onValueChange={(value) =>
+                      setFormData({ ...formData, plant_name: value })
+                    }
+                    required
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccione una planta" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {plants.map((plant) => (
+                        <SelectItem key={plant} value={plant}>
+                          {plant}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -436,7 +493,7 @@ export default function AccessControl() {
                     <TableHead>Resultado</TableHead>
                     <TableHead>Patente</TableHead>
                     <TableHead>Empresa</TableHead>
-                    <TableHead>Observaciones</TableHead>
+                    <TableHead>Acciones</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -465,12 +522,19 @@ export default function AccessControl() {
                             : '-'}
                         </TableCell>
                         <TableCell>
-                          {getRiskBadge(log.risk_level, log.risk_description)}
+                          {getRiskBadge(log.risk_level)}
                         </TableCell>
                         <TableCell>{log.vehicle_plate || '-'}</TableCell>
                         <TableCell>{log.company || '-'}</TableCell>
-                        <TableCell className="max-w-xs truncate">
-                          {log.observations || '-'}
+                        <TableCell>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => navigate(`/criminal-record/${log.person_rut}`)}
+                          >
+                            <Eye className="w-4 h-4 mr-1" />
+                            Ver detalles
+                          </Button>
                         </TableCell>
                       </TableRow>
                     ))

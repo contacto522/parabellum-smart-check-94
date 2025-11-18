@@ -11,6 +11,7 @@ import AdminPlants from "./pages/AdminPlants";
 import SecurityEvents from "./pages/SecurityEvents";
 import AIAnalysis from "./pages/AIAnalysis";
 import AccessControl from "./pages/AccessControl";
+import CriminalRecord from "./pages/CriminalRecord";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const App = () => (
             <Route path="/security/events" element={<SecurityEvents />} />
             <Route path="/ai/analysis" element={<AIAnalysis />} />
             <Route path="/access/control" element={<AccessControl />} />
+            <Route path="/criminal-record/:rut" element={<CriminalRecord />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
