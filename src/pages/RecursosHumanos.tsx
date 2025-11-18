@@ -167,7 +167,7 @@ export default function RecursosHumanos() {
               <ArrowLeft className="w-5 h-5" />
             </Button>
             <Users className="w-8 h-8 text-primary" />
-            <h1 className="text-2xl font-bold">Recursos Humanos</h1>
+            <h1 className="text-2xl font-bold">Verificación de personas</h1>
           </div>
         </div>
       </header>
