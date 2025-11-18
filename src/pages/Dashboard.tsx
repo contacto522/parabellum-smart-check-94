@@ -141,14 +141,14 @@ export default function Dashboard() {
             </Card>
           )}
 
-          {/* Recursos Humanos */}
+          {/* Verificación de personas */}
           {(hasRole('recursos_humanos') || hasRole('admin_seguridad')) && (
             <Card className="hover:shadow-glow transition-all cursor-pointer" onClick={() => navigate('/recursos-humanos')}>
               <CardHeader>
                 <Users className="w-10 h-10 text-primary mb-2" />
-                <CardTitle>Recursos Humanos</CardTitle>
+                <CardTitle>Verificación de personas</CardTitle>
                 <CardDescription>
-                  Gestión y verificación de personal
+                  Consultas de registros penales y laborales
                 </CardDescription>
               </CardHeader>
               <CardContent>
