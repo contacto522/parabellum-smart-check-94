@@ -10,6 +10,7 @@ import Dashboard from "./pages/Dashboard";
 import AdminPlants from "./pages/AdminPlants";
 import SecurityEvents from "./pages/SecurityEvents";
 import AIAnalysis from "./pages/AIAnalysis";
+import AccessControl from "./pages/AccessControl";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ const App = () => (
             <Route path="/admin/plants" element={<AdminPlants />} />
             <Route path="/security/events" element={<SecurityEvents />} />
             <Route path="/ai/analysis" element={<AIAnalysis />} />
+            <Route path="/access/control" element={<AccessControl />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
