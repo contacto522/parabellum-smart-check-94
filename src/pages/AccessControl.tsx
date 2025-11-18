@@ -83,7 +83,7 @@ export default function AccessControl() {
   ];
 
   // Simulate ID card scanning
-  const handleScanID = () => {
+  const handleScanID = async () => {
     if (!formData.person_rut || !formData.person_name) {
       toast({
         title: 'Datos incompletos',
@@ -95,9 +95,39 @@ export default function AccessControl() {
 
     setIsScanning(true);
     
+    // Check if user is blocked
+    const { data: blockedUser, error: blockError } = await supabase
+      .from('blocked_users')
+      .select('*')
+      .eq('person_rut', formData.person_rut)
+      .maybeSingle();
+
+    if (blockError) {
+      console.error('Error checking blocked users:', blockError);
+    }
+
     // Simulate scanning delay
     setTimeout(() => {
-      // Simulate random risk assessment
+      if (blockedUser) {
+        // User is blocked
+        setFormData({
+          ...formData,
+          risk_level: 'riesgo_alto',
+          risk_description: `ACCESO BLOQUEADO: ${blockedUser.block_reason}`,
+        });
+        
+        setIsScanning(false);
+        setHasScanned(true);
+        
+        toast({
+          title: '⛔ ACCESO DENEGADO',
+          description: blockedUser.block_reason,
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      // Simulate random risk assessment for non-blocked users
       const risks = [
         { level: 'sin_alertas' as const, description: '' },
         { level: 'riesgo_medio' as const, description: 'Antecedentes por falta administrativa' },
