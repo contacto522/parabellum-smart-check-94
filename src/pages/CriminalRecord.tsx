@@ -1,10 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, AlertTriangle, FileText, Calendar, MapPin } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { ArrowLeft, AlertTriangle, FileText, Calendar, MapPin, ShieldAlert } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
 
 interface CriminalRecord {
   type: string;
@@ -19,35 +23,52 @@ export default function CriminalRecord() {
   const navigate = useNavigate();
   const [personData, setPersonData] = useState<any>(null);
   const [records, setRecords] = useState<CriminalRecord[]>([]);
+  const [isBlocked, setIsBlocked] = useState(false);
+  const [blockReason, setBlockReason] = useState('');
 
   useEffect(() => {
-    // Simulated data - in production this would come from a real background check API
-    if (rut) {
-      // Mock person data
-      setPersonData({
-        rut: rut,
-        name: 'Persona de Ejemplo',
-        riskLevel: 'riesgo_alto',
-      });
+    const fetchData = async () => {
+      if (rut) {
+        // Check if user is blocked
+        const { data: blockedUser } = await supabase
+          .from('blocked_users')
+          .select('*')
+          .eq('person_rut', rut)
+          .maybeSingle();
 
-      // Mock criminal records
-      setRecords([
-        {
-          type: 'Robo con intimidación',
-          date: '2022-03-15',
-          description: 'Participación en robo con intimidación en establecimiento comercial',
-          location: 'Santiago, Región Metropolitana',
-          severity: 'high',
-        },
-        {
-          type: 'Receptación',
-          date: '2021-08-22',
-          description: 'Receptación de especies de procedencia ilícita',
-          location: 'Valparaíso, Región de Valparaíso',
-          severity: 'medium',
-        },
-      ]);
-    }
+        if (blockedUser) {
+          setIsBlocked(true);
+          setBlockReason(blockedUser.block_reason);
+        }
+
+        // Mock person data - Use RUT 98.765.432-1 for example
+        setPersonData({
+          rut: rut,
+          name: 'Persona de Ejemplo',
+          riskLevel: 'riesgo_alto',
+        });
+
+        // Mock criminal records
+        setRecords([
+          {
+            type: 'Robo con intimidación',
+            date: '2022-03-14',
+            description: 'Participación en robo con intimidación en establecimiento comercial',
+            location: 'Santiago, Región Metropolitana',
+            severity: 'high',
+          },
+          {
+            type: 'Receptación',
+            date: '2021-08-21',
+            description: 'Receptación de especies de procedencia ilícita',
+            location: 'Valparaíso, Región de Valparaíso',
+            severity: 'medium',
+          },
+        ]);
+      }
+    };
+
+    fetchData();
   }, [rut]);
 
   const getRiskBadge = (level: string) => {
@@ -115,6 +136,17 @@ export default function CriminalRecord() {
           </CardHeader>
         </Card>
 
+        {/* Blocked Alert */}
+        {isBlocked && (
+          <Alert variant="destructive" className="border-2">
+            <ShieldAlert className="h-5 w-5" />
+            <AlertTitle className="font-bold text-lg">⛔ ACCESO BLOQUEADO</AlertTitle>
+            <AlertDescription className="text-base mt-2">
+              {blockReason}
+            </AlertDescription>
+          </Alert>
+        )}
+
         {/* Criminal Records */}
         <Card>
           <CardHeader>
@@ -150,11 +182,7 @@ export default function CriminalRecord() {
                       <div className="flex items-center gap-2 text-muted-foreground">
                         <Calendar className="h-4 w-4" />
                         <span>
-                          {new Date(record.date).toLocaleDateString('es-CL', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                          })}
+                          {format(new Date(record.date), "d 'de' MMMM 'de' yyyy", { locale: es })}
                         </span>
                       </div>
                       <div className="flex items-center gap-2 text-muted-foreground">
@@ -181,13 +209,7 @@ export default function CriminalRecord() {
                 Esta información proviene de consultas a registros públicos y bases de datos oficiales.
               </p>
               <p className="text-muted-foreground">
-                Última actualización: {new Date().toLocaleDateString('es-CL', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
+                Última actualización: {format(new Date(), "d 'de' MMMM 'de' yyyy, h:mm a", { locale: es })}
               </p>
             </div>
           </CardContent>
