@@ -142,7 +142,7 @@ export default function Dashboard() {
           )}
 
           {/* Recursos Humanos */}
-          {hasRole('recursos_humanos') && (
+          {(hasRole('recursos_humanos') || hasRole('admin_seguridad')) && (
             <Card className="hover:shadow-glow transition-all cursor-pointer" onClick={() => navigate('/recursos-humanos')}>
               <CardHeader>
                 <Users className="w-10 h-10 text-primary mb-2" />

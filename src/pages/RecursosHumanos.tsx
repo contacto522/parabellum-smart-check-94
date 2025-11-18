@@ -13,7 +13,7 @@ export default function RecursosHumanos() {
     if (!loading && !user) {
       navigate('/auth');
     }
-    if (!loading && !hasRole('recursos_humanos')) {
+    if (!loading && !hasRole('recursos_humanos') && !hasRole('admin_seguridad')) {
       navigate('/dashboard');
     }
   }, [user, loading, hasRole, navigate]);
@@ -29,7 +29,7 @@ export default function RecursosHumanos() {
     );
   }
 
-  if (!user || !hasRole('recursos_humanos')) {
+  if (!user || (!hasRole('recursos_humanos') && !hasRole('admin_seguridad'))) {
     return null;
   }
 
