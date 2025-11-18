@@ -101,6 +101,48 @@ export type Database = {
         }
         Relationships: []
       }
+      hr_queries: {
+        Row: {
+          created_at: string
+          id: string
+          person_name: string | null
+          person_rut: string
+          queried_by: string
+          query_date: string
+          query_type: string
+          results_summary: Json | null
+          risk_description: string | null
+          risk_level: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          person_name?: string | null
+          person_rut: string
+          queried_by: string
+          query_date?: string
+          query_type: string
+          results_summary?: Json | null
+          risk_description?: string | null
+          risk_level: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          person_name?: string | null
+          person_rut?: string
+          queried_by?: string
+          query_date?: string
+          query_type?: string
+          results_summary?: Json | null
+          risk_description?: string | null
+          risk_level?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           area: string | null
