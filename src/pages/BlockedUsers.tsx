@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Plus, Upload, Trash2, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Plus, Upload, Trash2, AlertCircle, Search, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -48,6 +48,8 @@ export default function BlockedUsers() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [blockedUsers, setBlockedUsers] = useState<BlockedUser[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<BlockedUser[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -82,7 +84,25 @@ export default function BlockedUsers() {
     }
 
     setBlockedUsers(data || []);
+    setFilteredUsers(data || []);
   };
+
+  // Search filter effect
+  useEffect(() => {
+    if (!searchTerm.trim()) {
+      setFilteredUsers(blockedUsers);
+      return;
+    }
+
+    const term = searchTerm.toLowerCase();
+    const filtered = blockedUsers.filter(
+      (user) =>
+        user.person_rut.toLowerCase().includes(term) ||
+        (user.person_name && user.person_name.toLowerCase().includes(term)) ||
+        user.block_reason.toLowerCase().includes(term)
+    );
+    setFilteredUsers(filtered);
+  }, [searchTerm, blockedUsers]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -348,16 +368,57 @@ export default function BlockedUsers() {
           {/* Blocked Users Table */}
           <Card>
             <CardHeader>
-              <CardTitle>Usuarios Bloqueados ({blockedUsers.length})</CardTitle>
-              <CardDescription>
-                Lista completa de usuarios con acceso restringido
-              </CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Usuarios Bloqueados ({blockedUsers.length})</CardTitle>
+                  <CardDescription>
+                    {searchTerm && filteredUsers.length !== blockedUsers.length
+                      ? `Mostrando ${filteredUsers.length} de ${blockedUsers.length} resultados`
+                      : 'Lista completa de usuarios con acceso restringido'}
+                  </CardDescription>
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
+              {/* Search Bar */}
+              <div className="mb-6">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                  <Input
+                    placeholder="Buscar por RUT, nombre o motivo..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 pr-10"
+                  />
+                  {searchTerm && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-1 top-1/2 transform -translate-y-1/2 h-7 w-7"
+                      onClick={() => setSearchTerm('')}
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  )}
+                </div>
+              </div>
+
               {blockedUsers.length === 0 ? (
                 <div className="text-center py-12">
                   <AlertCircle className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                   <p className="text-muted-foreground">No hay usuarios bloqueados</p>
+                </div>
+              ) : filteredUsers.length === 0 ? (
+                <div className="text-center py-12">
+                  <Search className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground">No se encontraron resultados</p>
+                  <Button
+                    variant="link"
+                    onClick={() => setSearchTerm('')}
+                    className="mt-2"
+                  >
+                    Limpiar búsqueda
+                  </Button>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
@@ -372,7 +433,7 @@ export default function BlockedUsers() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {blockedUsers.map((user) => (
+                      {filteredUsers.map((user) => (
                         <TableRow key={user.id}>
                           <TableCell className="font-mono">{user.person_rut}</TableCell>
                           <TableCell>{user.person_name || '-'}</TableCell>
