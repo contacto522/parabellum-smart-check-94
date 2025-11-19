@@ -197,7 +197,7 @@ export default function Dashboard() {
 
           {/* 6. Mi Equipo de Trabajo */}
           {hasRole('admin_seguridad') && (
-            <Card className="hover:shadow-glow transition-all cursor-pointer">
+            <Card className="hover:shadow-glow transition-all cursor-pointer" onClick={() => navigate('/team-management')}>
               <CardHeader>
                 <UserCog className="w-10 h-10 text-primary mb-2" />
                 <CardTitle>Mi Equipo de Trabajo</CardTitle>

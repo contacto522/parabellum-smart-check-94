@@ -215,6 +215,42 @@ export type Database = {
         }
         Relationships: []
       }
+      team_members: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          email: string
+          id: string
+          monthly_credit_limit: number
+          name: string
+          role: Database["public"]["Enums"]["app_role"]
+          rut: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          email: string
+          id?: string
+          monthly_credit_limit?: number
+          name: string
+          role: Database["public"]["Enums"]["app_role"]
+          rut: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          email?: string
+          id?: string
+          monthly_credit_limit?: number
+          name?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          rut?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string

@@ -15,6 +15,7 @@ import CriminalRecord from "./pages/CriminalRecord";
 import BlockedUsers from "./pages/BlockedUsers";
 import RecursosHumanos from "./pages/RecursosHumanos";
 import Settings from "./pages/Settings";
+import TeamManagement from "./pages/TeamManagement";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -38,6 +39,7 @@ const App = () => (
             <Route path="/settings" element={<Settings />} />
             <Route path="/recursos-humanos" element={<RecursosHumanos />} />
             <Route path="/criminal-record/:rut" element={<CriminalRecord />} />
+            <Route path="/team-management" element={<TeamManagement />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
