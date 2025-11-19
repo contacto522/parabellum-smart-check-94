@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ArrowLeft, Users, Search, FileSearch, History, AlertCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -20,6 +21,10 @@ type QueryResult = {
   risk_level: string;
   risk_description: string | null;
   results_summary: any;
+  delito: string | null;
+  numero_causa: string | null;
+  tribunal: string | null;
+  situacion_legal: string | null;
 };
 
 export default function RecursosHumanos() {
@@ -52,7 +57,7 @@ export default function RecursosHumanos() {
       .from('hr_queries')
       .select('*')
       .order('query_date', { ascending: false })
-      .limit(10);
+      .limit(20);
 
     if (error) {
       console.error('Error loading history:', error);
@@ -75,18 +80,25 @@ export default function RecursosHumanos() {
     setSearching(true);
     
     // Simular búsqueda (en producción esto consultaría APIs reales)
+    const riskLevel = Math.random() > 0.5 ? "high" : Math.random() > 0.3 ? "medium" : "low";
+    const hasRecords = riskLevel !== "low";
+    
     const mockResult: QueryResult = {
       id: crypto.randomUUID(),
       query_date: new Date().toISOString(),
       person_rut: rut,
       person_name: "Persona Consultada",
       query_type: "criminal_record",
-      risk_level: Math.random() > 0.5 ? "high" : Math.random() > 0.3 ? "medium" : "low",
-      risk_description: "Registros penales encontrados",
+      risk_level: riskLevel,
+      risk_description: hasRecords ? "Registros penales encontrados" : null,
+      delito: hasRecords ? "Robo con intimidación" : null,
+      numero_causa: hasRecords ? "RUC-1234-2023" : null,
+      tribunal: hasRecords ? "7° Juzgado de Garantía de Santiago" : null,
+      situacion_legal: hasRecords ? (Math.random() > 0.7 ? "privado_libertad" : "libre") : null,
       results_summary: {
-        criminal_records: [
+        criminal_records: hasRecords ? [
           { type: "Robo con intimidación", severity: "Grave", date: "2022-03-14" }
-        ],
+        ] : [],
         labor_claims: []
       }
     };
@@ -100,6 +112,10 @@ export default function RecursosHumanos() {
         query_type: mockResult.query_type,
         risk_level: mockResult.risk_level,
         risk_description: mockResult.risk_description,
+        delito: mockResult.delito,
+        numero_causa: mockResult.numero_causa,
+        tribunal: mockResult.tribunal,
+        situacion_legal: mockResult.situacion_legal,
         results_summary: mockResult.results_summary,
         queried_by: user?.id
       });
@@ -139,7 +155,9 @@ export default function RecursosHumanos() {
 
   const filteredHistory = queryHistory.filter(q => 
     q.person_rut.toLowerCase().includes(historyFilter.toLowerCase()) ||
-    q.person_name?.toLowerCase().includes(historyFilter.toLowerCase())
+    q.person_name?.toLowerCase().includes(historyFilter.toLowerCase()) ||
+    q.delito?.toLowerCase().includes(historyFilter.toLowerCase()) ||
+    q.numero_causa?.toLowerCase().includes(historyFilter.toLowerCase())
   );
 
   if (loading) {
@@ -214,76 +232,52 @@ export default function RecursosHumanos() {
         {searchResult && (
           <Card>
             <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Resultados de Búsqueda</CardTitle>
-                  <CardDescription>
-                    RUT: {searchResult.person_rut}
-                  </CardDescription>
-                </div>
-                <Badge variant={getRiskColor(searchResult.risk_level)}>
-                  {getRiskLabel(searchResult.risk_level)}
-                </Badge>
-              </div>
+              <CardTitle>Resultado de Verificación</CardTitle>
+              <CardDescription>
+                Información detallada de la consulta realizada
+              </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid gap-4">
-                {/* Registros Penales */}
-                <div className="border rounded-lg p-4">
-                  <h3 className="font-semibold mb-2 flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4" />
-                    Registros Penales
-                  </h3>
-                  {searchResult.results_summary?.criminal_records?.length > 0 ? (
-                    <div className="space-y-2">
-                      {searchResult.results_summary.criminal_records.map((record: any, idx: number) => (
-                        <div key={idx} className="bg-muted/50 p-3 rounded">
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="font-medium">{record.type}</span>
-                            <Badge variant={record.severity === "Grave" ? "destructive" : "default"}>
-                              {record.severity}
-                            </Badge>
-                          </div>
-                          <p className="text-sm text-muted-foreground">{record.date}</p>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">Sin registros penales</p>
-                  )}
-                </div>
-
-                {/* Demandas Laborales */}
-                <div className="border rounded-lg p-4">
-                  <h3 className="font-semibold mb-2 flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4" />
-                    Demandas Laborales
-                  </h3>
-                  {searchResult.results_summary?.labor_claims?.length > 0 ? (
-                    <div className="space-y-2">
-                      {searchResult.results_summary.labor_claims.map((claim: any, idx: number) => (
-                        <div key={idx} className="bg-muted/50 p-3 rounded">
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="font-medium">{claim.type}</span>
-                            <Badge>{claim.status}</Badge>
-                          </div>
-                          <p className="text-sm text-muted-foreground">{claim.date}</p>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">Sin demandas laborales</p>
-                  )}
-                </div>
-              </div>
-
-              <Button 
-                variant="outline" 
-                className="w-full"
-                onClick={() => navigate(`/criminal-record/${searchResult.person_rut}`)}
-              >
-                Ver Detalles Completos
-              </Button>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Nombre</TableHead>
+                    <TableHead>RUT</TableHead>
+                    <TableHead>Delito</TableHead>
+                    <TableHead>RUC/N° Causa</TableHead>
+                    <TableHead>Tribunal</TableHead>
+                    <TableHead>Fecha</TableHead>
+                    <TableHead>Situación</TableHead>
+                    <TableHead>Nivel Riesgo</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRow>
+                    <TableCell className="font-medium">{searchResult.person_name || "Sin nombre"}</TableCell>
+                    <TableCell>{searchResult.person_rut}</TableCell>
+                    <TableCell>{searchResult.delito || "N/A"}</TableCell>
+                    <TableCell>{searchResult.numero_causa || "N/A"}</TableCell>
+                    <TableCell>{searchResult.tribunal || "N/A"}</TableCell>
+                    <TableCell>
+                      {format(new Date(searchResult.query_date), "dd/MM/yyyy", { locale: es })}
+                    </TableCell>
+                    <TableCell>
+                      {searchResult.situacion_legal === 'privado_libertad' ? (
+                        <Badge variant="destructive">Privado de libertad</Badge>
+                      ) : searchResult.situacion_legal === 'libre' ? (
+                        <Badge variant="secondary">Libre</Badge>
+                      ) : (
+                        <span className="text-muted-foreground">N/A</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={getRiskColor(searchResult.risk_level)}>
+                        {getRiskLabel(searchResult.risk_level)}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
             </CardContent>
           </Card>
         )}
@@ -305,38 +299,66 @@ export default function RecursosHumanos() {
           </CardHeader>
           <CardContent className="space-y-4">
             <Input
-              placeholder="Buscar en historial por RUT o nombre..."
+              placeholder="Buscar en historial por RUT, nombre o delito..."
               value={historyFilter}
               onChange={(e) => setHistoryFilter(e.target.value)}
             />
 
-            <div className="space-y-2">
-              {filteredHistory.length > 0 ? (
-                filteredHistory.map((query) => (
-                  <div 
-                    key={query.id} 
-                    className="border rounded-lg p-4 hover:bg-muted/50 transition-colors cursor-pointer"
-                    onClick={() => navigate(`/criminal-record/${query.person_rut}`)}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <div>
-                        <p className="font-medium">{query.person_name || "Sin nombre"}</p>
-                        <p className="text-sm text-muted-foreground">RUT: {query.person_rut}</p>
-                      </div>
-                      <Badge variant={getRiskColor(query.risk_level)}>
-                        {getRiskLabel(query.risk_level)}
-                      </Badge>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      {format(new Date(query.query_date), "d 'de' MMMM 'de' yyyy, h:mm a", { locale: es })}
-                    </p>
-                  </div>
-                ))
-              ) : (
-                <p className="text-center text-muted-foreground py-8">
-                  No hay consultas en el historial
-                </p>
-              )}
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Nombre</TableHead>
+                    <TableHead>RUT</TableHead>
+                    <TableHead>Delito</TableHead>
+                    <TableHead>N° Causa</TableHead>
+                    <TableHead>Tribunal</TableHead>
+                    <TableHead>Fecha</TableHead>
+                    <TableHead>Situación</TableHead>
+                    <TableHead>Riesgo</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredHistory.length > 0 ? (
+                    filteredHistory.map((query) => (
+                      <TableRow 
+                        key={query.id}
+                        className="cursor-pointer hover:bg-muted/50"
+                        onClick={() => navigate(`/criminal-record/${query.person_rut}`)}
+                      >
+                        <TableCell className="font-medium">{query.person_name || "Sin nombre"}</TableCell>
+                        <TableCell>{query.person_rut}</TableCell>
+                        <TableCell>{query.delito || "N/A"}</TableCell>
+                        <TableCell>{query.numero_causa || "N/A"}</TableCell>
+                        <TableCell className="max-w-[200px] truncate">{query.tribunal || "N/A"}</TableCell>
+                        <TableCell className="whitespace-nowrap">
+                          {format(new Date(query.query_date), "dd/MM/yyyy HH:mm", { locale: es })}
+                        </TableCell>
+                        <TableCell>
+                          {query.situacion_legal === 'privado_libertad' ? (
+                            <Badge variant="destructive">Privado</Badge>
+                          ) : query.situacion_legal === 'libre' ? (
+                            <Badge variant="secondary">Libre</Badge>
+                          ) : (
+                            <span className="text-muted-foreground text-xs">N/A</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={getRiskColor(query.risk_level)}>
+                            {getRiskLabel(query.risk_level)}
+                          </Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
+                        No hay consultas en el historial
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
             </div>
           </CardContent>
         </Card>
