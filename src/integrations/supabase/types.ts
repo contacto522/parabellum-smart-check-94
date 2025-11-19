@@ -68,6 +68,36 @@ export type Database = {
         }
         Relationships: []
       }
+      alert_contacts: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean
+          name: string
+          phone_number: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          phone_number: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          phone_number?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       blocked_users: {
         Row: {
           block_reason: string
