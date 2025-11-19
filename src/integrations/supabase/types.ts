@@ -104,7 +104,9 @@ export type Database = {
       hr_queries: {
         Row: {
           created_at: string
+          delito: string | null
           id: string
+          numero_causa: string | null
           person_name: string | null
           person_rut: string
           queried_by: string
@@ -113,11 +115,14 @@ export type Database = {
           results_summary: Json | null
           risk_description: string | null
           risk_level: string
+          tribunal: string | null
           updated_at: string
         }
         Insert: {
           created_at?: string
+          delito?: string | null
           id?: string
+          numero_causa?: string | null
           person_name?: string | null
           person_rut: string
           queried_by: string
@@ -126,11 +131,14 @@ export type Database = {
           results_summary?: Json | null
           risk_description?: string | null
           risk_level: string
+          tribunal?: string | null
           updated_at?: string
         }
         Update: {
           created_at?: string
+          delito?: string | null
           id?: string
+          numero_causa?: string | null
           person_name?: string | null
           person_rut?: string
           queried_by?: string
@@ -139,6 +147,7 @@ export type Database = {
           results_summary?: Json | null
           risk_description?: string | null
           risk_level?: string
+          tribunal?: string | null
           updated_at?: string
         }
         Relationships: []
