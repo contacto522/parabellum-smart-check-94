@@ -121,12 +121,12 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
 
-              <Card className="hover:shadow-glow transition-all cursor-pointer border-amber-500/50" onClick={() => navigate('/access/alert-contacts')}>
+              <Card className="hover:shadow-glow transition-all cursor-pointer border-primary/50" onClick={() => navigate('/settings')}>
                 <CardHeader>
-                  <AlertTriangle className="w-10 h-10 text-amber-600 mb-2" />
-                  <CardTitle>Contactos de Alerta</CardTitle>
+                  <UserCog className="w-10 h-10 text-primary mb-2" />
+                  <CardTitle>Configuraciones</CardTitle>
                   <CardDescription>
-                    Configurar números para alertas por WhatsApp
+                    Configurar alertas y otros parámetros del sistema
                   </CardDescription>
                 </CardHeader>
                 <CardContent>

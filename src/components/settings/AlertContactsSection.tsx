@@ -1,6 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,8 +6,9 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Plus, Trash2, Power, PowerOff } from 'lucide-react';
+import { Plus, Trash2, Power, PowerOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
 import {
   Dialog,
   DialogContent,
@@ -38,9 +37,8 @@ interface AlertContact {
   created_at: string;
 }
 
-export default function AlertContacts() {
-  const { user, loading } = useAuth();
-  const navigate = useNavigate();
+export default function AlertContactsSection() {
+  const { user } = useAuth();
   const { toast } = useToast();
   const [contacts, setContacts] = useState<AlertContact[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -49,12 +47,6 @@ export default function AlertContacts() {
     name: '',
     phone_number: '',
   });
-
-  useEffect(() => {
-    if (!loading && !user) {
-      navigate('/auth');
-    }
-  }, [user, loading, navigate]);
 
   useEffect(() => {
     if (user) {
@@ -85,7 +77,6 @@ export default function AlertContacts() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Validate phone number (must start with +56 for Chile)
     if (!formData.phone_number.startsWith('+56')) {
       toast({
         title: 'Número inválido',
@@ -170,88 +161,69 @@ export default function AlertContacts() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p className="text-lg">Cargando...</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="mb-6">
-        <Button
-          variant="ghost"
-          onClick={() => navigate('/dashboard')}
-          className="mb-4"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Volver al Dashboard
-        </Button>
-
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">Contactos de Alerta</h1>
-            <p className="text-muted-foreground">
-              Gestiona los números de WhatsApp que recibirán alertas de seguridad
-            </p>
-          </div>
-
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" />
-                Agregar Contacto
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Agregar Contacto de Alerta</DialogTitle>
-                <DialogDescription>
-                  Este contacto recibirá alertas por WhatsApp cuando ingresen personas con riesgo alto
-                </DialogDescription>
-              </DialogHeader>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <Label htmlFor="name">Nombre del Contacto</Label>
-                  <Input
-                    id="name"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="Ej: Juan Pérez - Jefe de Seguridad"
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="phone">Número de WhatsApp</Label>
-                  <Input
-                    id="phone"
-                    value={formData.phone_number}
-                    onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
-                    placeholder="+56912345678"
-                    required
-                  />
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Incluye el código de país (ej: +56 para Chile)
-                  </p>
-                </div>
-                <div className="flex justify-end space-x-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setIsDialogOpen(false)}
-                  >
-                    Cancelar
-                  </Button>
-                  <Button type="submit" disabled={isSubmitting}>
-                    {isSubmitting ? 'Guardando...' : 'Guardar'}
-                  </Button>
-                </div>
-              </form>
-            </DialogContent>
-          </Dialog>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold">Contactos de Alerta</h2>
+          <p className="text-muted-foreground">
+            Gestiona los números de WhatsApp que recibirán alertas de seguridad
+          </p>
         </div>
+
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogTrigger asChild>
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              Agregar Contacto
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Agregar Contacto de Alerta</DialogTitle>
+              <DialogDescription>
+                Este contacto recibirá alertas por WhatsApp cuando ingresen personas con riesgo alto
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <Label htmlFor="name">Nombre del Contacto</Label>
+                <Input
+                  id="name"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="Ej: Juan Pérez - Jefe de Seguridad"
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="phone">Número de WhatsApp</Label>
+                <Input
+                  id="phone"
+                  value={formData.phone_number}
+                  onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
+                  placeholder="+56912345678"
+                  required
+                />
+                <p className="text-sm text-muted-foreground mt-1">
+                  Incluye el código de país (ej: +56 para Chile)
+                </p>
+              </div>
+              <div className="flex justify-end space-x-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsDialogOpen(false)}
+                >
+                  Cancelar
+                </Button>
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? 'Guardando...' : 'Guardar'}
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <Card>
@@ -335,7 +307,7 @@ export default function AlertContacts() {
         </CardContent>
       </Card>
 
-      <Card className="mt-6">
+      <Card>
         <CardHeader>
           <CardTitle>¿Cómo funcionan las alertas?</CardTitle>
         </CardHeader>
