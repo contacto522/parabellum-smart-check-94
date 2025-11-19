@@ -90,14 +90,34 @@ export default function RecursosHumanos() {
       person_name: "Persona Consultada",
       query_type: "criminal_record",
       risk_level: riskLevel,
-      risk_description: hasRecords ? "Registros penales encontrados" : null,
+      risk_description: hasRecords ? "Múltiples registros penales encontrados" : null,
       delito: hasRecords ? "Robo con intimidación" : null,
       numero_causa: hasRecords ? "RUC-1234-2023" : null,
       tribunal: hasRecords ? "7° Juzgado de Garantía de Santiago" : null,
       situacion_legal: hasRecords ? (Math.random() > 0.7 ? "privado_libertad" : "libre") : null,
       results_summary: {
         criminal_records: hasRecords ? [
-          { type: "Robo con intimidación", severity: "Grave", date: "2022-03-14" }
+          { 
+            type: "Robo con intimidación", 
+            severity: "Grave", 
+            date: "2022-03-14",
+            numero_causa: "RUC-1234-2023",
+            tribunal: "7° Juzgado de Garantía de Santiago"
+          },
+          { 
+            type: "Receptación", 
+            severity: "Grave", 
+            date: "2021-11-08",
+            numero_causa: "RUC-5678-2021",
+            tribunal: "5° Juzgado de Garantía de Santiago"
+          },
+          { 
+            type: "Hurto simple", 
+            severity: "Medio", 
+            date: "2020-06-22",
+            numero_causa: "RIT-890-2020",
+            tribunal: "Juzgado de Garantía de Puente Alto"
+          }
         ] : [],
         labor_claims: []
       }
@@ -252,30 +272,62 @@ export default function RecursosHumanos() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  <TableRow>
-                    <TableCell className="font-medium">{searchResult.person_name || "Sin nombre"}</TableCell>
-                    <TableCell>{searchResult.person_rut}</TableCell>
-                    <TableCell>{searchResult.delito || "N/A"}</TableCell>
-                    <TableCell>{searchResult.numero_causa || "N/A"}</TableCell>
-                    <TableCell>{searchResult.tribunal || "N/A"}</TableCell>
-                    <TableCell>
-                      {format(new Date(searchResult.query_date), "dd/MM/yyyy", { locale: es })}
-                    </TableCell>
-                    <TableCell>
-                      {searchResult.situacion_legal === 'privado_libertad' ? (
-                        <Badge variant="destructive">Privado de libertad</Badge>
-                      ) : searchResult.situacion_legal === 'libre' ? (
+                  {searchResult.results_summary?.criminal_records && 
+                   searchResult.results_summary.criminal_records.length > 0 ? (
+                    searchResult.results_summary.criminal_records.map((record: any, index: number) => (
+                      <TableRow key={index}>
+                        <TableCell className="font-medium">
+                          {index === 0 ? searchResult.person_name || "Sin nombre" : ""}
+                        </TableCell>
+                        <TableCell>
+                          {index === 0 ? searchResult.person_rut : ""}
+                        </TableCell>
+                        <TableCell>{record.type || "N/A"}</TableCell>
+                        <TableCell>{record.numero_causa || "N/A"}</TableCell>
+                        <TableCell>{record.tribunal || "N/A"}</TableCell>
+                        <TableCell>
+                          {format(new Date(record.date), "dd/MM/yyyy", { locale: es })}
+                        </TableCell>
+                        <TableCell>
+                          {index === 0 ? (
+                            searchResult.situacion_legal === 'privado_libertad' ? (
+                              <Badge variant="destructive">Privado de libertad</Badge>
+                            ) : searchResult.situacion_legal === 'libre' ? (
+                              <Badge variant="secondary">Libre</Badge>
+                            ) : (
+                              <span className="text-muted-foreground">N/A</span>
+                            )
+                          ) : null}
+                        </TableCell>
+                        <TableCell>
+                          {index === 0 ? (
+                            <Badge variant={getRiskColor(searchResult.risk_level)}>
+                              {getRiskLabel(searchResult.risk_level)}
+                            </Badge>
+                          ) : null}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell className="font-medium">{searchResult.person_name || "Sin nombre"}</TableCell>
+                      <TableCell>{searchResult.person_rut}</TableCell>
+                      <TableCell>Sin registros</TableCell>
+                      <TableCell>N/A</TableCell>
+                      <TableCell>N/A</TableCell>
+                      <TableCell>
+                        {format(new Date(searchResult.query_date), "dd/MM/yyyy", { locale: es })}
+                      </TableCell>
+                      <TableCell>
                         <Badge variant="secondary">Libre</Badge>
-                      ) : (
-                        <span className="text-muted-foreground">N/A</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={getRiskColor(searchResult.risk_level)}>
-                        {getRiskLabel(searchResult.risk_level)}
-                      </Badge>
-                    </TableCell>
-                  </TableRow>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={getRiskColor(searchResult.risk_level)}>
+                          {getRiskLabel(searchResult.risk_level)}
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  )}
                 </TableBody>
               </Table>
             </CardContent>
