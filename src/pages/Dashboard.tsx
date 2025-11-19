@@ -88,7 +88,25 @@ export default function Dashboard() {
         )}
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {/* Control de Accesos */}
+          {/* 1. Administración de Plantas */}
+          {hasRole('admin_seguridad') && (
+            <Card className="hover:shadow-glow transition-all cursor-pointer" onClick={() => navigate('/admin/plants')}>
+              <CardHeader>
+                <Building className="w-10 h-10 text-primary mb-2" />
+                <CardTitle>Gestión de Plantas</CardTitle>
+                <CardDescription>
+                  Supervisión de todas las instalaciones
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button variant="hero" className="w-full">
+                  Ver Plantas
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* 2. Control de Accesos */}
           {hasRole('admin_seguridad') && (
             <>
               <Card className="hover:shadow-glow transition-all cursor-pointer" onClick={() => navigate('/access/control')}>
@@ -120,25 +138,10 @@ export default function Dashboard() {
                   </Button>
                 </CardContent>
               </Card>
-
-              <Card className="hover:shadow-glow transition-all cursor-pointer border-primary/50" onClick={() => navigate('/settings')}>
-                <CardHeader>
-                  <UserCog className="w-10 h-10 text-primary mb-2" />
-                  <CardTitle>Configuraciones</CardTitle>
-                  <CardDescription>
-                    Configurar alertas y otros parámetros del sistema
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Button variant="outline" className="w-full">
-                    Configurar
-                  </Button>
-                </CardContent>
-              </Card>
             </>
           )}
 
-          {/* Gestión de Eventos */}
+          {/* 3. Eventos de Seguridad */}
           {hasRole('admin_seguridad') && (
             <Card className="hover:shadow-glow transition-all cursor-pointer" onClick={() => navigate('/security/events')}>
               <CardHeader>
@@ -156,7 +159,7 @@ export default function Dashboard() {
             </Card>
           )}
 
-          {/* Verificación de personas */}
+          {/* 4. Verificación de personas */}
           {(hasRole('recursos_humanos') || hasRole('admin_seguridad')) && (
             <Card className="hover:shadow-glow transition-all cursor-pointer" onClick={() => navigate('/recursos-humanos')}>
               <CardHeader>
@@ -174,7 +177,7 @@ export default function Dashboard() {
             </Card>
           )}
 
-          {/* Análisis IA */}
+          {/* 5. Análisis con IA */}
           {(hasRole('admin_seguridad') || hasRole('recursos_humanos')) && (
             <Card className="hover:shadow-glow transition-all cursor-pointer" onClick={() => navigate('/ai/analysis')}>
               <CardHeader>
@@ -192,25 +195,7 @@ export default function Dashboard() {
             </Card>
           )}
 
-          {/* Administración de Plantas */}
-          {hasRole('admin_seguridad') && (
-            <Card className="hover:shadow-glow transition-all cursor-pointer" onClick={() => navigate('/admin/plants')}>
-              <CardHeader>
-                <Building className="w-10 h-10 text-primary mb-2" />
-                <CardTitle>Gestión de Plantas</CardTitle>
-                <CardDescription>
-                  Supervisión de todas las instalaciones
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button variant="hero" className="w-full">
-                  Ver Plantas
-                </Button>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Mi Equipo de Trabajo */}
+          {/* 6. Mi Equipo de Trabajo */}
           {hasRole('admin_seguridad') && (
             <Card className="hover:shadow-glow transition-all cursor-pointer">
               <CardHeader>
@@ -223,6 +208,24 @@ export default function Dashboard() {
               <CardContent>
                 <Button variant="hero" className="w-full">
                   Gestionar Equipo
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* 7. Configuraciones */}
+          {hasRole('admin_seguridad') && (
+            <Card className="hover:shadow-glow transition-all cursor-pointer border-primary/50" onClick={() => navigate('/settings')}>
+              <CardHeader>
+                <UserCog className="w-10 h-10 text-primary mb-2" />
+                <CardTitle>Configuraciones</CardTitle>
+                <CardDescription>
+                  Configurar alertas y otros parámetros del sistema
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button variant="outline" className="w-full">
+                  Configurar
                 </Button>
               </CardContent>
             </Card>
