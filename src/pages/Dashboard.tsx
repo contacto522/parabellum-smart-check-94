@@ -120,6 +120,21 @@ export default function Dashboard() {
                   </Button>
                 </CardContent>
               </Card>
+
+              <Card className="hover:shadow-glow transition-all cursor-pointer border-amber-500/50" onClick={() => navigate('/access/alert-contacts')}>
+                <CardHeader>
+                  <AlertTriangle className="w-10 h-10 text-amber-600 mb-2" />
+                  <CardTitle>Contactos de Alerta</CardTitle>
+                  <CardDescription>
+                    Configurar números para alertas por WhatsApp
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button variant="outline" className="w-full">
+                    Configurar
+                  </Button>
+                </CardContent>
+              </Card>
             </>
           )}
 

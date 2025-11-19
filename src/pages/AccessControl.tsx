@@ -232,6 +232,25 @@ export default function AccessControl() {
         description: 'Registro de acceso creado correctamente',
       });
 
+      // If risk level is high, send security alert
+      if (formData.risk_level === 'riesgo_alto') {
+        try {
+          await supabase.functions.invoke('send-security-alert', {
+            body: {
+              person_name: formData.person_name,
+              person_rut: formData.person_rut,
+              plant_name: formData.plant_name,
+              risk_level: formData.risk_level,
+              risk_description: formData.risk_description || 'Sin descripción adicional',
+            },
+          });
+          console.log('Security alert sent');
+        } catch (alertError) {
+          console.error('Error sending security alert:', alertError);
+          // Don't fail the whole operation if alert fails
+        }
+      }
+
       setIsDialogOpen(false);
       resetForm();
       fetchAccessLogs();
