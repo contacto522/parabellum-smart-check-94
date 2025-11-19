@@ -14,7 +14,7 @@ import AccessControl from "./pages/AccessControl";
 import CriminalRecord from "./pages/CriminalRecord";
 import BlockedUsers from "./pages/BlockedUsers";
 import RecursosHumanos from "./pages/RecursosHumanos";
-import AlertContacts from "./pages/AlertContacts";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,7 +35,7 @@ const App = () => (
             <Route path="/ai/analysis" element={<AIAnalysis />} />
             <Route path="/access/control" element={<AccessControl />} />
             <Route path="/access/blocked" element={<BlockedUsers />} />
-            <Route path="/access/alert-contacts" element={<AlertContacts />} />
+            <Route path="/settings" element={<Settings />} />
             <Route path="/recursos-humanos" element={<RecursosHumanos />} />
             <Route path="/criminal-record/:rut" element={<CriminalRecord />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
