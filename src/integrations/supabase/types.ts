@@ -115,6 +115,7 @@ export type Database = {
           results_summary: Json | null
           risk_description: string | null
           risk_level: string
+          situacion_legal: string | null
           tribunal: string | null
           updated_at: string
         }
@@ -131,6 +132,7 @@ export type Database = {
           results_summary?: Json | null
           risk_description?: string | null
           risk_level: string
+          situacion_legal?: string | null
           tribunal?: string | null
           updated_at?: string
         }
@@ -147,6 +149,7 @@ export type Database = {
           results_summary?: Json | null
           risk_description?: string | null
           risk_level?: string
+          situacion_legal?: string | null
           tribunal?: string | null
           updated_at?: string
         }
