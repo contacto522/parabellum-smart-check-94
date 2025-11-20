@@ -185,6 +185,42 @@ export type Database = {
         }
         Relationships: []
       }
+      plant_access_accounts: {
+        Row: {
+          account_email: string
+          account_name: string
+          can_control_access: boolean
+          can_scan_id: boolean
+          created_at: string
+          created_by: string | null
+          id: string
+          plant_name: string
+          updated_at: string
+        }
+        Insert: {
+          account_email: string
+          account_name: string
+          can_control_access?: boolean
+          can_scan_id?: boolean
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          plant_name: string
+          updated_at?: string
+        }
+        Update: {
+          account_email?: string
+          account_name?: string
+          can_control_access?: boolean
+          can_scan_id?: boolean
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          plant_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           area: string | null
