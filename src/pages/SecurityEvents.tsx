@@ -7,8 +7,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Upload, AlertCircle, AlertTriangle, Info, Filter } from "lucide-react";
+import { Upload, AlertCircle, AlertTriangle, Info, Filter, Plus, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+
+interface InvolvedPerson {
+  rut: string;
+  name: string;
+  role: string;
+}
 
 interface SecurityEvent {
   id: string;
@@ -19,6 +26,7 @@ interface SecurityEvent {
   plantName: string;
   date: string;
   files: string[];
+  involvedPeople?: InvolvedPerson[];
 }
 
 const SecurityEvents = () => {
@@ -28,6 +36,9 @@ const SecurityEvents = () => {
   const [riskLevel, setRiskLevel] = useState<string>("");
   const [selectedPlant, setSelectedPlant] = useState<string>("");
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
+  const [involvedPeople, setInvolvedPeople] = useState<InvolvedPerson[]>([
+    { rut: "", name: "", role: "" }
+  ]);
   
   const [events, setEvents] = useState<SecurityEvent[]>([
     {
@@ -59,7 +70,23 @@ const SecurityEvents = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleAddPerson = () => {
+    setInvolvedPeople([...involvedPeople, { rut: "", name: "", role: "" }]);
+  };
+
+  const handleRemovePerson = (index: number) => {
+    if (involvedPeople.length > 1) {
+      setInvolvedPeople(involvedPeople.filter((_, i) => i !== index));
+    }
+  };
+
+  const handlePersonChange = (index: number, field: keyof InvolvedPerson, value: string) => {
+    const updated = [...involvedPeople];
+    updated[index][field] = value;
+    setInvolvedPeople(updated);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!eventTitle || !eventDescription || !riskLevel || !selectedPlant) {
@@ -71,6 +98,9 @@ const SecurityEvents = () => {
       return;
     }
 
+    // Filter out empty people entries
+    const validPeople = involvedPeople.filter(p => p.rut && p.name && p.role);
+
     const newEvent: SecurityEvent = {
       id: Date.now().toString(),
       title: eventTitle,
@@ -79,14 +109,35 @@ const SecurityEvents = () => {
       plantId: selectedPlant,
       plantName: plants.find(p => p.id === selectedPlant)?.name || "",
       date: new Date().toISOString().split('T')[0],
-      files: attachedFiles.map(f => f.name)
+      files: attachedFiles.map(f => f.name),
+      involvedPeople: validPeople
     };
+
+    // Auto-block imputados
+    const imputados = validPeople.filter(p => p.role === "imputado");
+    
+    for (const imputado of imputados) {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        await supabase.from("blocked_users").insert({
+          person_rut: imputado.rut,
+          person_name: imputado.name,
+          block_reason: `Imputado en evento: ${eventTitle}`,
+          blocked_by: user?.id || null,
+        });
+      } catch (error) {
+        console.error("Error blocking user:", error);
+      }
+    }
 
     setEvents([newEvent, ...events]);
 
     toast({
       title: "Evento registrado",
-      description: "El evento de seguridad ha sido registrado exitosamente",
+      description: imputados.length > 0 
+        ? `Evento registrado. ${imputados.length} imputado(s) agregado(s) a la lista de bloqueados.`
+        : "El evento de seguridad ha sido registrado exitosamente",
     });
 
     // Reset form
@@ -95,6 +146,7 @@ const SecurityEvents = () => {
     setRiskLevel("");
     setSelectedPlant("");
     setAttachedFiles([]);
+    setInvolvedPeople([{ rut: "", name: "", role: "" }]);
   };
 
   const filteredEvents = events.filter(event => {
@@ -171,6 +223,92 @@ const SecurityEvents = () => {
                   rows={4}
                   required
                 />
+              </div>
+
+              {/* Personas Involucradas */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label>Personas involucradas</Label>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleAddPerson}
+                    className="gap-2"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Agregar persona
+                  </Button>
+                </div>
+
+                {involvedPeople.map((person, index) => (
+                  <Card key={index} className="p-4">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-sm font-medium">Persona {index + 1}</h4>
+                        {involvedPeople.length > 1 && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleRemovePerson(index)}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <Label htmlFor={`rut-${index}`}>RUT</Label>
+                          <Input
+                            id={`rut-${index}`}
+                            placeholder="12.345.678-9"
+                            value={person.rut}
+                            onChange={(e) => handlePersonChange(index, "rut", e.target.value)}
+                          />
+                        </div>
+
+                        <div>
+                          <Label htmlFor={`name-${index}`}>Nombre completo</Label>
+                          <Input
+                            id={`name-${index}`}
+                            placeholder="Nombre completo"
+                            value={person.name}
+                            onChange={(e) => handlePersonChange(index, "name", e.target.value)}
+                          />
+                        </div>
+
+                        <div>
+                          <Label htmlFor={`role-${index}`}>Participación</Label>
+                          <Select
+                            value={person.role}
+                            onValueChange={(value) => handlePersonChange(index, "role", value)}
+                          >
+                            <SelectTrigger id={`role-${index}`}>
+                              <SelectValue placeholder="Seleccionar rol" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="testigo">Testigo</SelectItem>
+                              <SelectItem value="victima">Víctima</SelectItem>
+                              <SelectItem value="imputado">Imputado</SelectItem>
+                              <SelectItem value="otro">Otro</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+
+                      {person.role === "imputado" && person.rut && person.name && (
+                        <div className="bg-destructive/10 border border-destructive/20 rounded-md p-3">
+                          <p className="text-sm text-destructive flex items-center gap-2">
+                            <AlertCircle className="h-4 w-4" />
+                            Esta persona será agregada automáticamente a la lista de bloqueados
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </Card>
+                ))}
               </div>
 
               {/* Nivel de Riesgo */}
