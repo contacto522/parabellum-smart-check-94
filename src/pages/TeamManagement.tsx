@@ -236,6 +236,7 @@ const TeamManagement = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="admin_seguridad">Administrador</SelectItem>
+                    <SelectItem value="seguridad">Seguridad</SelectItem>
                     <SelectItem value="recursos_humanos">Recursos Humanos</SelectItem>
                   </SelectContent>
                 </Select>
