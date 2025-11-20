@@ -215,6 +215,36 @@ export type Database = {
         }
         Relationships: []
       }
+      security_event_people: {
+        Row: {
+          created_at: string | null
+          event_id: string
+          id: string
+          person_name: string
+          person_rut: string
+          role: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          event_id: string
+          id?: string
+          person_name: string
+          person_rut: string
+          role: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          event_id?: string
+          id?: string
+          person_name?: string
+          person_rut?: string
+          role?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       team_members: {
         Row: {
           created_at: string
