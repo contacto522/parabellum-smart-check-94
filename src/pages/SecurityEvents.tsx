@@ -28,6 +28,7 @@ interface SecurityEvent {
   files: string[];
   involvedPeople?: InvolvedPerson[];
   avaluo?: number;
+  lugarHecho?: string;
 }
 
 const SecurityEvents = () => {
@@ -41,6 +42,7 @@ const SecurityEvents = () => {
     { rut: "", name: "", role: "" }
   ]);
   const [avaluo, setAvaluo] = useState<string>("");
+  const [lugarHecho, setLugarHecho] = useState<string>("");
   
   const [events, setEvents] = useState<SecurityEvent[]>([
     {
@@ -113,7 +115,8 @@ const SecurityEvents = () => {
       date: new Date().toISOString().split('T')[0],
       files: attachedFiles.map(f => f.name),
       involvedPeople: validPeople,
-      avaluo: avaluo ? parseInt(avaluo.replace(/\./g, '')) : undefined
+      avaluo: avaluo ? parseInt(avaluo.replace(/\./g, '')) : undefined,
+      lugarHecho: lugarHecho || undefined
     };
 
     // Auto-block sospechosos
@@ -151,6 +154,7 @@ const SecurityEvents = () => {
     setAttachedFiles([]);
     setInvolvedPeople([{ rut: "", name: "", role: "" }]);
     setAvaluo("");
+    setLugarHecho("");
   };
 
   const filteredEvents = events.filter(event => {
@@ -383,6 +387,17 @@ const SecurityEvents = () => {
                 )}
               </div>
 
+              {/* Lugar del Hecho */}
+              <div className="space-y-2">
+                <Label htmlFor="lugarHecho">Lugar del Hecho</Label>
+                <Input
+                  id="lugarHecho"
+                  placeholder="Ej: Ruta 5 Sur, km 120 / Sector 3 de la planta / Estacionamiento externo"
+                  value={lugarHecho}
+                  onChange={(e) => setLugarHecho(e.target.value)}
+                />
+              </div>
+
               {/* Adjuntar Archivos */}
               <div className="space-y-2">
                 <Label htmlFor="files">Adjuntar Archivos</Label>
@@ -486,6 +501,7 @@ const SecurityEvents = () => {
                     <TableHead>Título</TableHead>
                     <TableHead>Descripción</TableHead>
                     <TableHead>Planta</TableHead>
+                    <TableHead>Lugar del Hecho</TableHead>
                     <TableHead>Avalúo</TableHead>
                     <TableHead>Nivel de Riesgo</TableHead>
                     <TableHead>Archivos</TableHead>
@@ -494,7 +510,7 @@ const SecurityEvents = () => {
                 <TableBody>
                   {filteredEvents.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={7} className="text-center text-muted-foreground">
+                      <TableCell colSpan={8} className="text-center text-muted-foreground">
                         No se encontraron eventos que coincidan con los filtros
                       </TableCell>
                     </TableRow>
@@ -505,6 +521,13 @@ const SecurityEvents = () => {
                         <TableCell>{event.title}</TableCell>
                         <TableCell className="max-w-xs truncate">{event.description}</TableCell>
                         <TableCell>{event.plantName}</TableCell>
+                        <TableCell>
+                          {event.lugarHecho ? (
+                            <span className="text-sm">{event.lugarHecho}</span>
+                          ) : (
+                            <span className="text-muted-foreground">-</span>
+                          )}
+                        </TableCell>
                         <TableCell>
                           {event.avaluo ? (
                             <span className="font-medium">
