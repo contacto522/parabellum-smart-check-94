@@ -7,9 +7,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Upload, AlertCircle, AlertTriangle, Info, Filter, Plus, X } from "lucide-react";
+import { Upload, AlertCircle, AlertTriangle, Info, Filter, Plus, X, Eye, Printer } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface InvolvedPerson {
   rut: string;
@@ -43,6 +44,8 @@ const SecurityEvents = () => {
   ]);
   const [avaluo, setAvaluo] = useState<string>("");
   const [lugarHecho, setLugarHecho] = useState<string>("");
+  const [selectedEvent, setSelectedEvent] = useState<SecurityEvent | null>(null);
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
   
   const [events, setEvents] = useState<SecurityEvent[]>([
     {
@@ -182,6 +185,15 @@ const SecurityEvents = () => {
         {labels[level as keyof typeof labels]}
       </Badge>
     );
+  };
+
+  const handleViewEvent = (event: SecurityEvent) => {
+    setSelectedEvent(event);
+    setIsDetailDialogOpen(true);
+  };
+
+  const handlePrintEvent = () => {
+    window.print();
   };
 
   const getRiskIcon = (level: string) => {
@@ -504,13 +516,14 @@ const SecurityEvents = () => {
                     <TableHead>Lugar del Hecho</TableHead>
                     <TableHead>Avalúo</TableHead>
                     <TableHead>Nivel de Riesgo</TableHead>
+                    <TableHead>Acciones</TableHead>
                     <TableHead>Archivos</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredEvents.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center text-muted-foreground">
+                      <TableCell colSpan={9} className="text-center text-muted-foreground">
                         No se encontraron eventos que coincidan con los filtros
                       </TableCell>
                     </TableRow>
@@ -541,6 +554,17 @@ const SecurityEvents = () => {
                         <TableCell className="text-sm text-muted-foreground">
                           {event.files.length > 0 ? `${event.files.length} archivo(s)` : "Sin archivos"}
                         </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleViewEvent(event)}
+                            className="gap-2"
+                          >
+                            <Eye className="h-4 w-4" />
+                            Ver detalle
+                          </Button>
+                        </TableCell>
                       </TableRow>
                     ))
                   )}
@@ -549,6 +573,115 @@ const SecurityEvents = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Dialog de Detalle del Evento */}
+        <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto print:max-w-full">
+            <DialogHeader>
+              <div className="flex items-center justify-between">
+                <DialogTitle>Detalle del Evento de Seguridad</DialogTitle>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handlePrintEvent}
+                  className="gap-2 print:hidden"
+                >
+                  <Printer className="h-4 w-4" />
+                  Imprimir
+                </Button>
+              </div>
+            </DialogHeader>
+            
+            {selectedEvent && (
+              <div className="space-y-6 print:space-y-4">
+                {/* Información Básica */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-muted-foreground">Título</Label>
+                    <p className="font-semibold">{selectedEvent.title}</p>
+                  </div>
+                  <div>
+                    <Label className="text-muted-foreground">Fecha</Label>
+                    <p className="font-semibold">{selectedEvent.date}</p>
+                  </div>
+                  <div>
+                    <Label className="text-muted-foreground">Planta</Label>
+                    <p className="font-semibold">{selectedEvent.plantName}</p>
+                  </div>
+                  <div>
+                    <Label className="text-muted-foreground">Nivel de Riesgo</Label>
+                    <div className="mt-1">{getRiskBadge(selectedEvent.riskLevel)}</div>
+                  </div>
+                </div>
+
+                {/* Descripción */}
+                <div>
+                  <Label className="text-muted-foreground">Descripción</Label>
+                  <p className="mt-2 text-sm">{selectedEvent.description}</p>
+                </div>
+
+                {/* Lugar del Hecho */}
+                {selectedEvent.lugarHecho && (
+                  <div>
+                    <Label className="text-muted-foreground">Lugar del Hecho</Label>
+                    <p className="mt-2 text-sm">{selectedEvent.lugarHecho}</p>
+                  </div>
+                )}
+
+                {/* Avalúo */}
+                {selectedEvent.avaluo && (
+                  <div>
+                    <Label className="text-muted-foreground">Avalúo (Pérdida Estimada)</Label>
+                    <p className="mt-2 text-lg font-bold text-destructive">
+                      ${selectedEvent.avaluo.toLocaleString('es-CL')} CLP
+                    </p>
+                  </div>
+                )}
+
+                {/* Personas Involucradas */}
+                {selectedEvent.involvedPeople && selectedEvent.involvedPeople.length > 0 && (
+                  <div>
+                    <Label className="text-muted-foreground">Personas Involucradas</Label>
+                    <div className="mt-2 space-y-3">
+                      {selectedEvent.involvedPeople.map((person, index) => (
+                        <Card key={index} className="p-4">
+                          <div className="grid grid-cols-3 gap-4">
+                            <div>
+                              <Label className="text-xs text-muted-foreground">RUT</Label>
+                              <p className="text-sm font-medium">{person.rut}</p>
+                            </div>
+                            <div>
+                              <Label className="text-xs text-muted-foreground">Nombre</Label>
+                              <p className="text-sm font-medium">{person.name}</p>
+                            </div>
+                            <div>
+                              <Label className="text-xs text-muted-foreground">Rol</Label>
+                              <Badge variant={person.role === "sospechoso" ? "destructive" : "secondary"}>
+                                {person.role.charAt(0).toUpperCase() + person.role.slice(1)}
+                              </Badge>
+                            </div>
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Archivos Adjuntos */}
+                {selectedEvent.files && selectedEvent.files.length > 0 && (
+                  <div>
+                    <Label className="text-muted-foreground">Archivos Adjuntos</Label>
+                    <div className="mt-2 space-y-1">
+                      {selectedEvent.files.map((file, index) => (
+                        <p key={index} className="text-sm">• {file}</p>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
