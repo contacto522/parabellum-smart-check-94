@@ -142,6 +142,7 @@ const TeamManagement = () => {
     const roles: Record<AppRole, string> = {
       admin_seguridad: "Administrador",
       recursos_humanos: "Recursos Humanos",
+      seguridad: "Seguridad",
     };
     return roles[role] || role;
   };
