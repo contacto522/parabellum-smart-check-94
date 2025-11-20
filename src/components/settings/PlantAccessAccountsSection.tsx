@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -25,6 +26,7 @@ export default function PlantAccessAccountsSection() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [accounts, setAccounts] = useState<PlantAccessAccount[]>([]);
+  const [plants, setPlants] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -38,6 +40,7 @@ export default function PlantAccessAccountsSection() {
 
   useEffect(() => {
     fetchAccounts();
+    fetchPlants();
   }, []);
 
   const fetchAccounts = async () => {
@@ -59,6 +62,23 @@ export default function PlantAccessAccountsSection() {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchPlants = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('access_logs')
+        .select('plant_name')
+        .order('plant_name');
+
+      if (error) throw error;
+
+      // Obtener plantas únicas
+      const uniquePlants = [...new Set(data?.map(log => log.plant_name) || [])];
+      setPlants(uniquePlants);
+    } catch (error: any) {
+      console.error('Error fetching plants:', error);
     }
   };
 
@@ -225,13 +245,28 @@ export default function PlantAccessAccountsSection() {
 
               <div className="space-y-2">
                 <Label htmlFor="plant_name">Planta Asignada</Label>
-                <Input
-                  id="plant_name"
+                <Select
                   value={formData.plant_name}
-                  onChange={(e) => setFormData({ ...formData, plant_name: e.target.value })}
-                  placeholder="Ej: Planta Norte"
+                  onValueChange={(value) => setFormData({ ...formData, plant_name: value })}
                   required
-                />
+                >
+                  <SelectTrigger id="plant_name">
+                    <SelectValue placeholder="Seleccione una planta" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {plants.length === 0 ? (
+                      <SelectItem value="no-plants" disabled>
+                        No hay plantas disponibles
+                      </SelectItem>
+                    ) : (
+                      plants.map((plant) => (
+                        <SelectItem key={plant} value={plant}>
+                          {plant}
+                        </SelectItem>
+                      ))
+                    )}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-4 pt-4">
