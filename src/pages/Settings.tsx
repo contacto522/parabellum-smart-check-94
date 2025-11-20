@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft } from 'lucide-react';
 import { useEffect } from 'react';
 import AlertContactsSection from '@/components/settings/AlertContactsSection';
+import PlantAccessAccountsSection from '@/components/settings/PlantAccessAccountsSection';
 
 export default function Settings() {
   const { user, loading } = useAuth();
@@ -45,12 +46,17 @@ export default function Settings() {
       <Tabs defaultValue="alert-contacts" className="w-full">
         <TabsList>
           <TabsTrigger value="alert-contacts">Contactos de Alerta</TabsTrigger>
+          <TabsTrigger value="plant-access">Cuentas de Acceso</TabsTrigger>
           <TabsTrigger value="general" disabled>General</TabsTrigger>
           <TabsTrigger value="notifications" disabled>Notificaciones</TabsTrigger>
         </TabsList>
         
         <TabsContent value="alert-contacts" className="mt-6">
           <AlertContactsSection />
+        </TabsContent>
+        
+        <TabsContent value="plant-access" className="mt-6">
+          <PlantAccessAccountsSection />
         </TabsContent>
         
         <TabsContent value="general" className="mt-6">
