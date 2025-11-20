@@ -113,17 +113,17 @@ const SecurityEvents = () => {
       involvedPeople: validPeople
     };
 
-    // Auto-block imputados
-    const imputados = validPeople.filter(p => p.role === "imputado");
+    // Auto-block sospechosos
+    const sospechosos = validPeople.filter(p => p.role === "sospechoso");
     
-    for (const imputado of imputados) {
+    for (const sospechoso of sospechosos) {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         
         await supabase.from("blocked_users").insert({
-          person_rut: imputado.rut,
-          person_name: imputado.name,
-          block_reason: `Imputado en evento: ${eventTitle}`,
+          person_rut: sospechoso.rut,
+          person_name: sospechoso.name,
+          block_reason: `Sospechoso en evento: ${eventTitle}`,
           blocked_by: user?.id || null,
         });
       } catch (error) {
@@ -135,8 +135,8 @@ const SecurityEvents = () => {
 
     toast({
       title: "Evento registrado",
-      description: imputados.length > 0 
-        ? `Evento registrado. ${imputados.length} imputado(s) agregado(s) a la lista de bloqueados.`
+      description: sospechosos.length > 0 
+        ? `Evento registrado. ${sospechosos.length} sospechoso(s) agregado(s) a la lista de bloqueados.`
         : "El evento de seguridad ha sido registrado exitosamente",
     });
 
@@ -291,14 +291,14 @@ const SecurityEvents = () => {
                             <SelectContent>
                               <SelectItem value="testigo">Testigo</SelectItem>
                               <SelectItem value="victima">Víctima</SelectItem>
-                              <SelectItem value="imputado">Imputado</SelectItem>
+                              <SelectItem value="sospechoso">Sospechoso</SelectItem>
                               <SelectItem value="otro">Otro</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
                       </div>
 
-                      {person.role === "imputado" && person.rut && person.name && (
+                      {person.role === "sospechoso" && person.rut && person.name && (
                         <div className="bg-destructive/10 border border-destructive/20 rounded-md p-3">
                           <p className="text-sm text-destructive flex items-center gap-2">
                             <AlertCircle className="h-4 w-4" />
