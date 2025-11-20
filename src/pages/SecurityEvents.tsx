@@ -27,6 +27,7 @@ interface SecurityEvent {
   date: string;
   files: string[];
   involvedPeople?: InvolvedPerson[];
+  avaluo?: number;
 }
 
 const SecurityEvents = () => {
@@ -39,6 +40,7 @@ const SecurityEvents = () => {
   const [involvedPeople, setInvolvedPeople] = useState<InvolvedPerson[]>([
     { rut: "", name: "", role: "" }
   ]);
+  const [avaluo, setAvaluo] = useState<string>("");
   
   const [events, setEvents] = useState<SecurityEvent[]>([
     {
@@ -110,7 +112,8 @@ const SecurityEvents = () => {
       plantName: plants.find(p => p.id === selectedPlant)?.name || "",
       date: new Date().toISOString().split('T')[0],
       files: attachedFiles.map(f => f.name),
-      involvedPeople: validPeople
+      involvedPeople: validPeople,
+      avaluo: avaluo ? parseInt(avaluo.replace(/\./g, '')) : undefined
     };
 
     // Auto-block sospechosos
@@ -147,6 +150,7 @@ const SecurityEvents = () => {
     setSelectedPlant("");
     setAttachedFiles([]);
     setInvolvedPeople([{ rut: "", name: "", role: "" }]);
+    setAvaluo("");
   };
 
   const filteredEvents = events.filter(event => {
@@ -358,6 +362,27 @@ const SecurityEvents = () => {
                 </Select>
               </div>
 
+              {/* Avalúo */}
+              <div className="space-y-2">
+                <Label htmlFor="avaluo">Avalúo (pérdida en pesos chilenos)</Label>
+                <Input
+                  id="avaluo"
+                  type="text"
+                  placeholder="Ej: 300.000.000"
+                  value={avaluo}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, '');
+                    const formatted = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                    setAvaluo(formatted);
+                  }}
+                />
+                {avaluo && (
+                  <p className="text-sm text-muted-foreground">
+                    Pérdida estimada: ${avaluo} CLP
+                  </p>
+                )}
+              </div>
+
               {/* Adjuntar Archivos */}
               <div className="space-y-2">
                 <Label htmlFor="files">Adjuntar Archivos</Label>
@@ -461,6 +486,7 @@ const SecurityEvents = () => {
                     <TableHead>Título</TableHead>
                     <TableHead>Descripción</TableHead>
                     <TableHead>Planta</TableHead>
+                    <TableHead>Avalúo</TableHead>
                     <TableHead>Nivel de Riesgo</TableHead>
                     <TableHead>Archivos</TableHead>
                   </TableRow>
@@ -468,7 +494,7 @@ const SecurityEvents = () => {
                 <TableBody>
                   {filteredEvents.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center text-muted-foreground">
+                      <TableCell colSpan={7} className="text-center text-muted-foreground">
                         No se encontraron eventos que coincidan con los filtros
                       </TableCell>
                     </TableRow>
@@ -479,6 +505,15 @@ const SecurityEvents = () => {
                         <TableCell>{event.title}</TableCell>
                         <TableCell className="max-w-xs truncate">{event.description}</TableCell>
                         <TableCell>{event.plantName}</TableCell>
+                        <TableCell>
+                          {event.avaluo ? (
+                            <span className="font-medium">
+                              ${event.avaluo.toLocaleString('es-CL')} CLP
+                            </span>
+                          ) : (
+                            <span className="text-muted-foreground">-</span>
+                          )}
+                        </TableCell>
                         <TableCell>{getRiskBadge(event.riskLevel)}</TableCell>
                         <TableCell className="text-sm text-muted-foreground">
                           {event.files.length > 0 ? `${event.files.length} archivo(s)` : "Sin archivos"}
