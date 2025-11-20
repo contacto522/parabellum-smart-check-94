@@ -395,7 +395,10 @@ export default function PlantAccessAccountsSection() {
         </CardHeader>
         <CardContent className="space-y-2 text-sm text-muted-foreground">
           <p>
-            • Las cuentas vinculadas tendrán acceso exclusivo a la planta asignada
+            • La cuenta vinculada a una planta al realizar control de acceso y salida escaneando una cédula con la app, genera datos que se vinculan a la planta asociada
+          </p>
+          <p>
+            • Por ejemplo, si un guardia tiene una cuenta asociada a la Planta Norte y está de turno para hacer control de acceso, todos los escaneos se vincularán como registros a esa planta
           </p>
           <p>
             • El permiso de "Escanear cédula" permite validar documentos de identidad
