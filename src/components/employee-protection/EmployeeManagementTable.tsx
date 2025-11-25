@@ -1,7 +1,6 @@
-import { useState, useEffect } from "react";
-import { Search, Plus, Pencil, Trash2, UserPlus } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Search, Plus, Pencil, Trash2, UserPlus, Upload } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import GenerateEmployeePhotos from "./GenerateEmployeePhotos";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -76,6 +75,9 @@ const EmployeeManagementTable = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState<MonitoredEmployee | null>(null);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     name: "",
     rut: "",
@@ -128,6 +130,8 @@ const EmployeeManagementTable = () => {
 
   const handleCreateEmployee = () => {
     setSelectedEmployee(null);
+    setPhotoFile(null);
+    setPhotoPreview(null);
     setFormData({
       name: "",
       rut: "",
@@ -142,6 +146,8 @@ const EmployeeManagementTable = () => {
 
   const handleEditEmployee = (employee: MonitoredEmployee) => {
     setSelectedEmployee(employee);
+    setPhotoFile(null);
+    setPhotoPreview(employee.photo_url);
     setFormData({
       name: employee.name,
       rut: employee.rut,
@@ -159,12 +165,50 @@ const EmployeeManagementTable = () => {
     setIsDeleteDialogOpen(true);
   };
 
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setPhotoFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPhotoPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = async () => {
     try {
+      let photoUrl = selectedEmployee?.photo_url || null;
+
+      // Upload photo if a new one was selected
+      if (photoFile) {
+        const fileExt = photoFile.name.split(".").pop();
+        const fileName = `${formData.rut.replace(/[.-]/g, "")}-${Date.now()}.${fileExt}`;
+        const filePath = `photos/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("employee-photos")
+          .upload(filePath, photoFile, {
+            upsert: true,
+          });
+
+        if (uploadError) throw uploadError;
+
+        const {
+          data: { publicUrl },
+        } = supabase.storage.from("employee-photos").getPublicUrl(filePath);
+
+        photoUrl = publicUrl;
+      }
+
       if (selectedEmployee) {
         const { error } = await supabase
           .from("monitored_employees")
-          .update(formData)
+          .update({
+            ...formData,
+            photo_url: photoUrl,
+          })
           .eq("id", selectedEmployee.id);
 
         if (error) throw error;
@@ -178,6 +222,7 @@ const EmployeeManagementTable = () => {
           .from("monitored_employees")
           .insert({
             ...formData,
+            photo_url: photoUrl,
             created_by: user?.id,
           });
 
@@ -190,6 +235,8 @@ const EmployeeManagementTable = () => {
       }
 
       setIsDialogOpen(false);
+      setPhotoFile(null);
+      setPhotoPreview(null);
       fetchEmployees();
     } catch (error: any) {
       toast({
@@ -245,13 +292,10 @@ const EmployeeManagementTable = () => {
             className="pl-10"
           />
         </div>
-        <div className="flex items-center gap-2">
-          <GenerateEmployeePhotos />
-          <Button onClick={handleCreateEmployee} className="gap-2">
-            <UserPlus className="h-4 w-4" />
-            Crear Nuevo Trabajador
-          </Button>
-        </div>
+        <Button onClick={handleCreateEmployee} className="gap-2">
+          <UserPlus className="h-4 w-4" />
+          Crear Nuevo Trabajador
+        </Button>
       </div>
 
       {/* Table */}
@@ -391,6 +435,38 @@ const EmployeeManagementTable = () => {
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label>Fotografía</Label>
+              <div className="flex items-center gap-4">
+                <Avatar className="h-20 w-20">
+                  <AvatarImage src={photoPreview || undefined} />
+                  <AvatarFallback>
+                    <Upload className="h-8 w-8" />
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handlePhotoChange}
+                    className="hidden"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-full"
+                  >
+                    <Upload className="h-4 w-4 mr-2" />
+                    {photoPreview ? "Cambiar Foto" : "Subir Foto"}
+                  </Button>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Formato: JPG, PNG (máx. 5MB)
+                  </p>
+                </div>
+              </div>
+            </div>
             <div className="grid gap-2">
               <Label htmlFor="name">Nombre Completo *</Label>
               <Input
