@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Shield, LogOut, Users, FileSearch, AlertTriangle, Building, UserCog, History, UserX } from 'lucide-react';
+import { Shield, LogOut, Users, FileSearch, AlertTriangle, Building, UserCog, History, UserX, HeartHandshake, ArrowRight, Settings as SettingsIcon } from 'lucide-react';
 
 export default function Dashboard() {
   const { user, loading, signOut, userRoles, hasRole } = useAuth();
@@ -213,11 +213,29 @@ export default function Dashboard() {
             </Card>
           )}
 
-          {/* 7. Configuraciones */}
+          {/* 7. Protección de Empleados */}
+          {hasRole('admin_seguridad') && (
+            <Card className="hover:shadow-glow transition-all cursor-pointer border-primary/50" onClick={() => navigate('/employee-protection')}>
+              <CardHeader>
+                <HeartHandshake className="w-10 h-10 text-primary mb-2" />
+                <CardTitle>Protección de Empleados</CardTitle>
+                <CardDescription>
+                  Monitoreo en tiempo real y gestión de seguridad de empleados
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button variant="hero" className="w-full">
+                  Monitorear
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* 8. Configuraciones */}
           {hasRole('admin_seguridad') && (
             <Card className="hover:shadow-glow transition-all cursor-pointer border-primary/50" onClick={() => navigate('/settings')}>
               <CardHeader>
-                <UserCog className="w-10 h-10 text-primary mb-2" />
+                <SettingsIcon className="w-10 h-10 text-primary mb-2" />
                 <CardTitle>Configuraciones</CardTitle>
                 <CardDescription>
                   Configurar alertas y otros parámetros del sistema
