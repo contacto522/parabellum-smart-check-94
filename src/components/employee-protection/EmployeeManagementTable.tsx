@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { Search, Plus, Pencil, Trash2, UserPlus } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import GenerateEmployeePhotos from "./GenerateEmployeePhotos";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -60,6 +62,7 @@ interface MonitoredEmployee {
   alert_status: string;
   is_active: boolean;
   created_at: string;
+  photo_url: string | null;
 }
 
 const ITEMS_PER_PAGE = 10;
@@ -242,10 +245,13 @@ const EmployeeManagementTable = () => {
             className="pl-10"
           />
         </div>
-        <Button onClick={handleCreateEmployee} className="gap-2">
-          <UserPlus className="h-4 w-4" />
-          Crear Nuevo Trabajador
-        </Button>
+        <div className="flex items-center gap-2">
+          <GenerateEmployeePhotos />
+          <Button onClick={handleCreateEmployee} className="gap-2">
+            <UserPlus className="h-4 w-4" />
+            Crear Nuevo Trabajador
+          </Button>
+        </div>
       </div>
 
       {/* Table */}
@@ -253,7 +259,7 @@ const EmployeeManagementTable = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Nombre</TableHead>
+              <TableHead>Empleado</TableHead>
               <TableHead>RUT</TableHead>
               <TableHead>Planta</TableHead>
               <TableHead>Cargo</TableHead>
@@ -278,7 +284,22 @@ const EmployeeManagementTable = () => {
             ) : (
               currentEmployees.map((employee) => (
                 <TableRow key={employee.id}>
-                  <TableCell className="font-medium">{employee.name}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-10 w-10">
+                        <AvatarImage src={employee.photo_url || undefined} alt={employee.name} />
+                        <AvatarFallback>
+                          {employee.name
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")
+                            .substring(0, 2)
+                            .toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="font-medium">{employee.name}</span>
+                    </div>
+                  </TableCell>
                   <TableCell>{employee.rut}</TableCell>
                   <TableCell>{employee.plant_name}</TableCell>
                   <TableCell>{employee.position || "-"}</TableCell>
