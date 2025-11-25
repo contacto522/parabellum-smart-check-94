@@ -19,6 +19,7 @@ interface MonitoredEmployee {
   longitude: number | null;
   last_location_update: string | null;
   photo_url: string | null;
+  position: string | null;
 }
 
 interface EmployeeAlert {
@@ -38,6 +39,7 @@ const EmployeeMonitoringMap = () => {
   const [employees, setEmployees] = useState<MonitoredEmployee[]>([]);
   const [alerts, setAlerts] = useState<EmployeeAlert[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedEmployee, setSelectedEmployee] = useState<MonitoredEmployee | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
@@ -96,12 +98,30 @@ const EmployeeMonitoringMap = () => {
       emp.plant_name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // Auto-select first employee when searching
+  useEffect(() => {
+    if (searchQuery && filteredEmployees.length > 0) {
+      setSelectedEmployee(filteredEmployees[0]);
+    } else if (!searchQuery) {
+      setSelectedEmployee(null);
+    }
+  }, [searchQuery, filteredEmployees.length]);
+
   const employeesWithAlerts = filteredEmployees.filter(
     (emp) => emp.alert_status === "alert"
   );
   const normalEmployees = filteredEmployees.filter(
     (emp) => emp.alert_status === "normal"
   );
+
+  const handleEmployeeClick = (employee: MonitoredEmployee) => {
+    setSelectedEmployee(employee);
+    setSearchQuery(employee.name);
+    toast({
+      title: "Empleado ubicado",
+      description: `${employee.name} - ${employee.plant_name}`,
+    });
+  };
 
   return (
     <div className="space-y-6">
@@ -129,6 +149,11 @@ const EmployeeMonitoringMap = () => {
             <CardTitle className="flex items-center gap-2">
               <MapPin className="h-5 w-5" />
               Mapa de Monitoreo
+              {selectedEmployee && (
+                <Badge variant="outline" className="ml-auto">
+                  Ubicando: {selectedEmployee.name}
+                </Badge>
+              )}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -147,36 +172,81 @@ const EmployeeMonitoringMap = () => {
                 <div className="absolute bottom-1/4 right-1/4 w-40 h-28 border-2 border-blue-500/50 bg-blue-500/10 rounded-lg flex items-center justify-center">
                   <span className="text-xs font-medium">Planta Sur</span>
                 </div>
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-36 h-36 border-2 border-green-500/50 bg-green-500/10 rounded-lg flex items-center justify-center">
+                  <span className="text-xs font-medium">Planta Central</span>
+                </div>
 
-                {/* Employee markers */}
-                {employeesWithAlerts.slice(0, 3).map((emp, idx) => (
-                  <div
-                    key={emp.id}
-                    className="absolute animate-pulse"
-                    style={{
-                      top: `${30 + idx * 15}%`,
-                      left: `${25 + idx * 20}%`,
-                    }}
-                  >
-                    <div className="relative">
-                      <div className="w-6 h-6 bg-destructive rounded-full border-2 border-background shadow-lg" />
-                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-destructive rounded-full animate-ping" />
+                {/* Employee markers with click interaction */}
+                {employeesWithAlerts.slice(0, 3).map((emp, idx) => {
+                  const isSelected = selectedEmployee?.id === emp.id;
+                  return (
+                    <div
+                      key={emp.id}
+                      className={`absolute cursor-pointer transition-all ${
+                        isSelected ? "z-50 scale-150" : "hover:scale-110"
+                      }`}
+                      style={{
+                        top: `${30 + idx * 15}%`,
+                        left: `${25 + idx * 20}%`,
+                      }}
+                      onClick={() => handleEmployeeClick(emp)}
+                      title={emp.name}
+                    >
+                      <div className="relative">
+                        {isSelected && (
+                          <div className="absolute -inset-4 bg-destructive/20 rounded-full animate-ping" />
+                        )}
+                        <Avatar className={`h-8 w-8 border-2 ${isSelected ? 'border-yellow-400' : 'border-background'} shadow-lg`}>
+                          <AvatarImage src={emp.photo_url || undefined} />
+                          <AvatarFallback className="bg-destructive text-destructive-foreground text-xs">
+                            {emp.name.split(" ").map((n) => n[0]).join("").substring(0, 2)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-destructive rounded-full animate-pulse" />
+                        {isSelected && (
+                          <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-background/90 px-2 py-1 rounded text-xs font-medium border shadow-lg">
+                            {emp.name}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
 
-                {normalEmployees.slice(0, 5).map((emp, idx) => (
-                  <div
-                    key={emp.id}
-                    className="absolute"
-                    style={{
-                      top: `${40 + idx * 10}%`,
-                      left: `${40 + idx * 8}%`,
-                    }}
-                  >
-                    <div className="w-5 h-5 bg-primary rounded-full border-2 border-background shadow-lg" />
-                  </div>
-                ))}
+                {normalEmployees.slice(0, 5).map((emp, idx) => {
+                  const isSelected = selectedEmployee?.id === emp.id;
+                  return (
+                    <div
+                      key={emp.id}
+                      className={`absolute cursor-pointer transition-all ${
+                        isSelected ? "z-50 scale-150" : "hover:scale-110"
+                      }`}
+                      style={{
+                        top: `${40 + idx * 10}%`,
+                        left: `${40 + idx * 8}%`,
+                      }}
+                      onClick={() => handleEmployeeClick(emp)}
+                      title={emp.name}
+                    >
+                      <div className="relative">
+                        {isSelected && (
+                          <div className="absolute -inset-4 bg-primary/20 rounded-full animate-ping" />
+                        )}
+                        <Avatar className={`h-7 w-7 border-2 ${isSelected ? 'border-yellow-400' : 'border-background'} shadow-lg`}>
+                          <AvatarImage src={emp.photo_url || undefined} />
+                          <AvatarFallback className="bg-primary text-primary-foreground text-xs">
+                            {emp.name.split(" ").map((n) => n[0]).join("").substring(0, 2)}
+                          </AvatarFallback>
+                        </Avatar>
+                        {isSelected && (
+                          <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-background/90 px-2 py-1 rounded text-xs font-medium border shadow-lg">
+                            {emp.name}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
 
               {/* Legend */}
@@ -193,11 +263,62 @@ const EmployeeMonitoringMap = () => {
                 </div>
               </div>
 
-              <div className="absolute inset-0 flex items-center justify-center">
-                <p className="text-muted-foreground text-sm bg-background/80 backdrop-blur-sm px-4 py-2 rounded-lg border">
-                  Vista previa del mapa interactivo
-                </p>
-              </div>
+              {!selectedEmployee && (
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <p className="text-muted-foreground text-sm bg-background/80 backdrop-blur-sm px-4 py-2 rounded-lg border">
+                    Busca un empleado o haz clic en un marcador
+                  </p>
+                </div>
+              )}
+
+              {selectedEmployee && (
+                <div className="absolute bottom-4 right-4 bg-card/95 backdrop-blur-sm p-4 rounded-lg border shadow-lg max-w-xs">
+                  <div className="flex items-center gap-3 mb-2">
+                    <Avatar className="h-12 w-12">
+                      <AvatarImage src={selectedEmployee.photo_url || undefined} />
+                      <AvatarFallback>
+                        {selectedEmployee.name.split(" ").map((n) => n[0]).join("").substring(0, 2)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <p className="font-semibold text-sm">{selectedEmployee.name}</p>
+                      <p className="text-xs text-muted-foreground">{selectedEmployee.rut}</p>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedEmployee(null);
+                        setSearchQuery("");
+                      }}
+                    >
+                      ✕
+                    </Button>
+                  </div>
+                  <div className="space-y-1 text-xs">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="h-3 w-3 text-muted-foreground" />
+                      <span>{selectedEmployee.plant_name}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Users className="h-3 w-3 text-muted-foreground" />
+                      <span>{selectedEmployee.position || "Sin cargo"}</span>
+                    </div>
+                    <div className="mt-2">
+                      {selectedEmployee.alert_status === "alert" ? (
+                        <Badge variant="destructive" className="text-xs">
+                          <AlertTriangle className="h-3 w-3 mr-1" />
+                          Alerta Activa
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="text-xs">
+                          Estado Normal
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
