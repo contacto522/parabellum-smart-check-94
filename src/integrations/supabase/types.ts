@@ -131,6 +131,53 @@ export type Database = {
         }
         Relationships: []
       }
+      employee_alerts: {
+        Row: {
+          alert_type: string
+          created_at: string
+          description: string
+          employee_id: string
+          id: string
+          is_resolved: boolean
+          latitude: number | null
+          longitude: number | null
+          resolved_at: string | null
+          resolved_by: string | null
+        }
+        Insert: {
+          alert_type: string
+          created_at?: string
+          description: string
+          employee_id: string
+          id?: string
+          is_resolved?: boolean
+          latitude?: number | null
+          longitude?: number | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+        }
+        Update: {
+          alert_type?: string
+          created_at?: string
+          description?: string
+          employee_id?: string
+          id?: string
+          is_resolved?: boolean
+          latitude?: number | null
+          longitude?: number | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_alerts_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "monitored_employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       hr_queries: {
         Row: {
           created_at: string
@@ -181,6 +228,60 @@ export type Database = {
           risk_level?: string
           situacion_legal?: string | null
           tribunal?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      monitored_employees: {
+        Row: {
+          alert_status: string
+          created_at: string
+          created_by: string | null
+          email: string | null
+          id: string
+          is_active: boolean
+          last_location_update: string | null
+          latitude: number | null
+          longitude: number | null
+          name: string
+          phone_number: string | null
+          plant_name: string
+          position: string | null
+          rut: string
+          updated_at: string
+        }
+        Insert: {
+          alert_status?: string
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          last_location_update?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          name: string
+          phone_number?: string | null
+          plant_name: string
+          position?: string | null
+          rut: string
+          updated_at?: string
+        }
+        Update: {
+          alert_status?: string
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          last_location_update?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          name?: string
+          phone_number?: string | null
+          plant_name?: string
+          position?: string | null
+          rut?: string
           updated_at?: string
         }
         Relationships: []

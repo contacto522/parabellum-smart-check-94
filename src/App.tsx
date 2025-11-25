@@ -16,6 +16,7 @@ import BlockedUsers from "./pages/BlockedUsers";
 import RecursosHumanos from "./pages/RecursosHumanos";
 import Settings from "./pages/Settings";
 import TeamManagement from "./pages/TeamManagement";
+import EmployeeProtection from "./pages/EmployeeProtection";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -40,6 +41,7 @@ const App = () => (
             <Route path="/recursos-humanos" element={<RecursosHumanos />} />
             <Route path="/criminal-record/:rut" element={<CriminalRecord />} />
             <Route path="/team-management" element={<TeamManagement />} />
+            <Route path="/employee-protection" element={<EmployeeProtection />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
