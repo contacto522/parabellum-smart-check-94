@@ -245,6 +245,7 @@ export type Database = {
           longitude: number | null
           name: string
           phone_number: string | null
+          photo_url: string | null
           plant_name: string
           position: string | null
           rut: string
@@ -262,6 +263,7 @@ export type Database = {
           longitude?: number | null
           name: string
           phone_number?: string | null
+          photo_url?: string | null
           plant_name: string
           position?: string | null
           rut: string
@@ -279,6 +281,7 @@ export type Database = {
           longitude?: number | null
           name?: string
           phone_number?: string | null
+          photo_url?: string | null
           plant_name?: string
           position?: string | null
           rut?: string

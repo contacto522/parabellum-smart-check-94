@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -17,6 +18,7 @@ interface MonitoredEmployee {
   latitude: number | null;
   longitude: number | null;
   last_location_update: string | null;
+  photo_url: string | null;
 }
 
 interface EmployeeAlert {
@@ -225,37 +227,60 @@ const EmployeeMonitoringMap = () => {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {alerts.map((alert) => (
-                    <Card key={alert.id} className="border-destructive/50">
-                      <CardContent className="p-4">
-                        <div className="space-y-2">
-                          <div className="flex items-start justify-between gap-2">
-                            <Badge variant="destructive" className="text-xs">
-                              {alert.alert_type}
-                            </Badge>
-                            <span className="text-xs text-muted-foreground">
-                              {new Date(alert.created_at).toLocaleString("es-ES", {
-                                day: "2-digit",
-                                month: "short",
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              })}
-                            </span>
+                  {alerts.map((alert) => {
+                    const employee = employees.find(
+                      (emp) => emp.id === alert.employee_id
+                    );
+                    return (
+                      <Card key={alert.id} className="border-destructive/50">
+                        <CardContent className="p-4">
+                          <div className="space-y-2">
+                            <div className="flex items-start justify-between gap-2">
+                              <Badge variant="destructive" className="text-xs">
+                                {alert.alert_type}
+                              </Badge>
+                              <span className="text-xs text-muted-foreground">
+                                {new Date(alert.created_at).toLocaleString("es-ES", {
+                                  day: "2-digit",
+                                  month: "short",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <Avatar className="h-8 w-8">
+                                <AvatarImage
+                                  src={employee?.photo_url || undefined}
+                                  alt={alert.monitored_employees?.name}
+                                />
+                                <AvatarFallback className="text-xs">
+                                  {alert.monitored_employees?.name
+                                    .split(" ")
+                                    .map((n) => n[0])
+                                    .join("")
+                                    .substring(0, 2)
+                                    .toUpperCase()}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <p className="font-medium text-sm">
+                                  {alert.monitored_employees?.name}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  {alert.monitored_employees?.plant_name}
+                                </p>
+                              </div>
+                            </div>
+                            <p className="text-sm">{alert.description}</p>
+                            <Button size="sm" className="w-full mt-2">
+                              Resolver Alerta
+                            </Button>
                           </div>
-                          <p className="font-medium text-sm">
-                            {alert.monitored_employees?.name}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {alert.monitored_employees?.plant_name}
-                          </p>
-                          <p className="text-sm">{alert.description}</p>
-                          <Button size="sm" className="w-full mt-2">
-                            Resolver Alerta
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
                 </div>
               )}
             </ScrollArea>
