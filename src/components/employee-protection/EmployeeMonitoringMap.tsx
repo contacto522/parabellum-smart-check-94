@@ -32,6 +32,7 @@ interface EmployeeAlert {
   audio_url: string | null;
   location_link: string | null;
   incident_category: string | null;
+  custom_description: string | null;
   monitored_employees: {
     name: string;
     plant_name: string;
@@ -179,36 +180,51 @@ const EmployeeMonitoringMap = () => {
                   <span className="text-xs font-medium">Planta Central</span>
                 </div>
 
-                {/* Employee markers with click interaction */}
+                {/* Employee markers with EMERGENCY ALERT status */}
                 {employeesWithAlerts.slice(0, 3).map((emp, idx) => {
                   const isSelected = selectedEmployee?.id === emp.id;
                   return (
                     <div
                       key={emp.id}
                       className={`absolute cursor-pointer transition-all ${
-                        isSelected ? "z-50 scale-150" : "hover:scale-110"
+                        isSelected ? "z-50 scale-150" : "hover:scale-125 z-40"
                       }`}
                       style={{
                         top: `${30 + idx * 15}%`,
                         left: `${25 + idx * 20}%`,
                       }}
                       onClick={() => handleEmployeeClick(emp)}
-                      title={emp.name}
+                      title={`${emp.name} - ⚠️ EMERGENCIA`}
                     >
                       <div className="relative">
+                        {/* Multiple pulsing rings for emergency */}
+                        <div className="absolute -inset-6 bg-destructive/30 rounded-full animate-ping" />
+                        <div className="absolute -inset-4 bg-destructive/20 rounded-full animate-ping animation-delay-150" />
                         {isSelected && (
-                          <div className="absolute -inset-4 bg-destructive/20 rounded-full animate-ping" />
+                          <div className="absolute -inset-8 bg-yellow-500/20 rounded-full animate-ping" />
                         )}
-                        <Avatar className={`h-8 w-8 border-2 ${isSelected ? 'border-yellow-400' : 'border-background'} shadow-lg`}>
+                        
+                        {/* Emergency badge */}
+                        <div className="absolute -top-3 -left-3 bg-destructive text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full animate-pulse z-10">
+                          SOS
+                        </div>
+                        
+                        <Avatar className={`h-10 w-10 border-3 ${isSelected ? 'border-yellow-400 ring-4 ring-yellow-400/50' : 'border-destructive ring-2 ring-destructive/50'} shadow-2xl`}>
                           <AvatarImage src={emp.photo_url || undefined} />
-                          <AvatarFallback className="bg-destructive text-destructive-foreground text-xs">
+                          <AvatarFallback className="bg-destructive text-destructive-foreground text-xs font-bold">
                             {emp.name.split(" ").map((n) => n[0]).join("").substring(0, 2)}
                           </AvatarFallback>
                         </Avatar>
-                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-destructive rounded-full animate-pulse" />
+                        
+                        {/* Animated danger indicator */}
+                        <div className="absolute -top-1 -right-1 flex items-center justify-center">
+                          <div className="w-4 h-4 bg-destructive rounded-full animate-pulse" />
+                          <div className="absolute w-2 h-2 bg-white rounded-full" />
+                        </div>
+                        
                         {isSelected && (
-                          <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-background/90 px-2 py-1 rounded text-xs font-medium border shadow-lg">
-                            {emp.name}
+                          <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 whitespace-nowrap bg-destructive text-destructive-foreground px-3 py-1.5 rounded-lg text-xs font-bold border-2 border-destructive shadow-2xl animate-pulse">
+                            🚨 {emp.name} - EMERGENCIA
                           </div>
                         )}
                       </div>
@@ -309,9 +325,9 @@ const EmployeeMonitoringMap = () => {
                     </div>
                     <div className="mt-2">
                       {selectedEmployee.alert_status === "alert" ? (
-                        <Badge variant="destructive" className="text-xs">
+                        <Badge variant="destructive" className="text-xs font-bold animate-pulse">
                           <AlertTriangle className="h-3 w-3 mr-1" />
-                          Alerta Activa
+                          🚨 EMERGENCIA ACTIVA
                         </Badge>
                       ) : (
                         <Badge variant="outline" className="text-xs">
@@ -356,12 +372,12 @@ const EmployeeMonitoringMap = () => {
                       (emp) => emp.id === alert.employee_id
                     );
                     return (
-                      <Card key={alert.id} className="border-destructive/50">
+                  <Card key={alert.id} className="border-destructive bg-destructive/5">
                         <CardContent className="p-4">
-                          <div className="space-y-2">
+                          <div className="space-y-3">
                             <div className="flex items-start justify-between gap-2">
-                              <Badge variant="destructive" className="text-xs">
-                                {alert.alert_type}
+                              <Badge variant="destructive" className="text-xs animate-pulse">
+                                🚨 {alert.alert_type}
                               </Badge>
                               <span className="text-xs text-muted-foreground">
                                 {new Date(alert.created_at).toLocaleString("es-ES", {
@@ -372,23 +388,27 @@ const EmployeeMonitoringMap = () => {
                                 })}
                               </span>
                             </div>
+                            
                             <div className="flex items-center gap-3">
-                              <Avatar className="h-8 w-8">
-                                <AvatarImage
-                                  src={employee?.photo_url || undefined}
-                                  alt={alert.monitored_employees?.name}
-                                />
-                                <AvatarFallback className="text-xs">
-                                  {alert.monitored_employees?.name
-                                    .split(" ")
-                                    .map((n) => n[0])
-                                    .join("")
-                                    .substring(0, 2)
-                                    .toUpperCase()}
-                                </AvatarFallback>
-                              </Avatar>
-                              <div>
-                                <p className="font-medium text-sm">
+                              <div className="relative">
+                                <Avatar className="h-10 w-10 ring-2 ring-destructive">
+                                  <AvatarImage
+                                    src={employee?.photo_url || undefined}
+                                    alt={alert.monitored_employees?.name}
+                                  />
+                                  <AvatarFallback className="text-xs bg-destructive text-destructive-foreground">
+                                    {alert.monitored_employees?.name
+                                      .split(" ")
+                                      .map((n) => n[0])
+                                      .join("")
+                                      .substring(0, 2)
+                                      .toUpperCase()}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div className="absolute -top-1 -right-1 w-3 h-3 bg-destructive rounded-full animate-pulse" />
+                              </div>
+                              <div className="flex-1">
+                                <p className="font-semibold text-sm">
                                   {alert.monitored_employees?.name}
                                 </p>
                                 <p className="text-xs text-muted-foreground">
@@ -396,13 +416,36 @@ const EmployeeMonitoringMap = () => {
                                 </p>
                               </div>
                             </div>
-                            <p className="text-sm">{alert.description}</p>
+
+                            {/* Incident Category - Prominent */}
+                            {alert.incident_category && (
+                              <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-2">
+                                <p className="text-xs font-medium text-destructive mb-1">Tipo de Emergencia:</p>
+                                <Badge variant="destructive" className="text-xs">
+                                  {alert.incident_category === 'robo' && '🔪 Robo'}
+                                  {alert.incident_category === 'trafico_drogas' && '💊 Tráfico de Drogas'}
+                                  {alert.incident_category === 'rina' && '👊 Riña'}
+                                  {alert.incident_category === 'homicidio' && '☠️ Homicidio'}
+                                  {alert.incident_category === 'arma_fuego' && '🔫 Arma de Fuego/Disparos'}
+                                  {alert.incident_category === 'otro' && '⚠️ Otro'}
+                                </Badge>
+                                {alert.custom_description && (
+                                  <p className="text-xs mt-1 text-foreground">{alert.custom_description}</p>
+                                )}
+                              </div>
+                            )}
+
+                            <p className="text-sm text-foreground/80">{alert.description}</p>
                             
-                            {/* Audio Player */}
+                            {/* Audio Player - Prominent */}
                             {alert.audio_url && (
-                              <div className="mt-2">
-                                <audio controls className="w-full h-8">
+                              <div className="bg-primary/5 border border-primary/20 rounded-lg p-3">
+                                <p className="text-xs font-medium mb-2 flex items-center gap-1">
+                                  🎤 Audio de Emergencia (3s)
+                                </p>
+                                <audio controls className="w-full">
                                   <source src={alert.audio_url} type="audio/webm" />
+                                  Tu navegador no soporta la reproducción de audio.
                                 </audio>
                               </div>
                             )}
@@ -412,24 +455,15 @@ const EmployeeMonitoringMap = () => {
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="w-full mt-2"
+                                className="w-full"
                                 onClick={() => window.open(alert.location_link!, "_blank")}
                               >
-                                📍 Ver Ubicación en Mapa
+                                📍 Ver Ubicación en Google Maps
                               </Button>
                             )}
                             
-                            {/* Category Badge */}
-                            {alert.incident_category && (
-                              <div className="mt-2">
-                                <Badge variant="outline" className="text-xs">
-                                  Categoría: {alert.incident_category}
-                                </Badge>
-                              </div>
-                            )}
-                            
-                            <Button size="sm" className="w-full mt-2">
-                              Resolver Alerta
+                            <Button size="sm" className="w-full bg-green-600 hover:bg-green-700">
+                              ✓ Resolver Alerta
                             </Button>
                           </div>
                         </CardContent>
