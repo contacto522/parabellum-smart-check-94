@@ -134,36 +134,51 @@ export type Database = {
       employee_alerts: {
         Row: {
           alert_type: string
+          audio_transcript: string | null
+          audio_url: string | null
           created_at: string
+          custom_description: string | null
           description: string
           employee_id: string
           id: string
+          incident_category: string | null
           is_resolved: boolean
           latitude: number | null
+          location_link: string | null
           longitude: number | null
           resolved_at: string | null
           resolved_by: string | null
         }
         Insert: {
           alert_type: string
+          audio_transcript?: string | null
+          audio_url?: string | null
           created_at?: string
+          custom_description?: string | null
           description: string
           employee_id: string
           id?: string
+          incident_category?: string | null
           is_resolved?: boolean
           latitude?: number | null
+          location_link?: string | null
           longitude?: number | null
           resolved_at?: string | null
           resolved_by?: string | null
         }
         Update: {
           alert_type?: string
+          audio_transcript?: string | null
+          audio_url?: string | null
           created_at?: string
+          custom_description?: string | null
           description?: string
           employee_id?: string
           id?: string
+          incident_category?: string | null
           is_resolved?: boolean
           latitude?: number | null
+          location_link?: string | null
           longitude?: number | null
           resolved_at?: string | null
           resolved_by?: string | null

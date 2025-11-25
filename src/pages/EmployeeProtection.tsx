@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import EmployeeMonitoringMap from "@/components/employee-protection/EmployeeMonitoringMap";
 import EmployeeManagementTable from "@/components/employee-protection/EmployeeManagementTable";
+import PanicButton from "@/components/employee-protection/PanicButton";
 
 const EmployeeProtection = () => {
   const { user, signOut } = useAuth();
@@ -73,6 +74,14 @@ const EmployeeProtection = () => {
           </CardContent>
         </Card>
       </main>
+
+      {/* Panic Button - Only shown in monitoring view */}
+      {activeTab === "monitoring" && user && (
+        <PanicButton 
+          employeeId={user.id} 
+          employeeName={user.email || "Usuario"}
+        />
+      )}
     </div>
   );
 };

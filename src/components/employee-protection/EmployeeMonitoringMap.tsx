@@ -29,6 +29,9 @@ interface EmployeeAlert {
   description: string;
   created_at: string;
   is_resolved: boolean;
+  audio_url: string | null;
+  location_link: string | null;
+  incident_category: string | null;
   monitored_employees: {
     name: string;
     plant_name: string;
@@ -394,6 +397,37 @@ const EmployeeMonitoringMap = () => {
                               </div>
                             </div>
                             <p className="text-sm">{alert.description}</p>
+                            
+                            {/* Audio Player */}
+                            {alert.audio_url && (
+                              <div className="mt-2">
+                                <audio controls className="w-full h-8">
+                                  <source src={alert.audio_url} type="audio/webm" />
+                                </audio>
+                              </div>
+                            )}
+                            
+                            {/* Location Link */}
+                            {alert.location_link && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="w-full mt-2"
+                                onClick={() => window.open(alert.location_link!, "_blank")}
+                              >
+                                📍 Ver Ubicación en Mapa
+                              </Button>
+                            )}
+                            
+                            {/* Category Badge */}
+                            {alert.incident_category && (
+                              <div className="mt-2">
+                                <Badge variant="outline" className="text-xs">
+                                  Categoría: {alert.incident_category}
+                                </Badge>
+                              </div>
+                            )}
+                            
                             <Button size="sm" className="w-full mt-2">
                               Resolver Alerta
                             </Button>
