@@ -85,6 +85,7 @@ const EmployeeMonitoringMap = () => {
           )
         `)
         .eq("is_resolved", false)
+        .eq("alert_type", "panic_button")
         .order("created_at", { ascending: false })
         .limit(10);
 
@@ -377,7 +378,7 @@ const EmployeeMonitoringMap = () => {
                           <div className="space-y-3">
                             <div className="flex items-start justify-between gap-2">
                               <Badge variant="destructive" className="text-xs animate-pulse">
-                                🚨 {alert.alert_type}
+                                🚨 Botón de Pánico Activado
                               </Badge>
                               <span className="text-xs text-muted-foreground">
                                 {new Date(alert.created_at).toLocaleString("es-ES", {
