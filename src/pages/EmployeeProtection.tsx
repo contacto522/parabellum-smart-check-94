@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import EmployeeMonitoringMap from "@/components/employee-protection/EmployeeMonitoringMap";
 import EmployeeManagementTable from "@/components/employee-protection/EmployeeManagementTable";
+import ExternalManagementTable from "@/components/employee-protection/ExternalManagementTable";
 import PanicButton from "@/components/employee-protection/PanicButton";
 
 const EmployeeProtection = () => {
@@ -52,7 +53,7 @@ const EmployeeProtection = () => {
         <Card>
           <CardContent className="p-6">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full max-w-md grid-cols-2 mb-6">
+              <TabsList className="grid w-full max-w-2xl grid-cols-3 mb-6">
                 <TabsTrigger value="monitoring" className="gap-2">
                   <MapPin className="h-4 w-4" />
                   Monitoreo en Mapa
@@ -60,6 +61,10 @@ const EmployeeProtection = () => {
                 <TabsTrigger value="management" className="gap-2">
                   <Users className="h-4 w-4" />
                   Gestión de Empleados
+                </TabsTrigger>
+                <TabsTrigger value="externals" className="gap-2">
+                  <Users className="h-4 w-4" />
+                  Gestión de Externos
                 </TabsTrigger>
               </TabsList>
 
@@ -69,6 +74,10 @@ const EmployeeProtection = () => {
 
               <TabsContent value="management" className="mt-0">
                 <EmployeeManagementTable />
+              </TabsContent>
+
+              <TabsContent value="externals" className="mt-0">
+                <ExternalManagementTable />
               </TabsContent>
             </Tabs>
           </CardContent>
